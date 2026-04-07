@@ -1,0 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:wght@300;400;500;600&family=Jost:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --gold:  #C9A84C;
+  --goldL: #E5C97A;
+  --black: #0A0A0A;
+  --ivory: #FAF7F2;
+  --champ: #F5E6C8;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--ivory);
+  color: var(--black);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
+
+/* Gold divider */
+.gold-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+/* Skeleton loader */
+.skeleton {
+  background: linear-gradient(90deg, #f0e8d8 25%, #f7efe2 50%, #f0e8d8 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Ticker */
+.ticker-wrap  { overflow: hidden; white-space: nowrap; }
+.ticker-inner { display: inline-block; animation: ticker 40s linear infinite; }
+
+/* Image zoom on hover */
+.img-zoom            { overflow: hidden; }
+.img-zoom img        { transition: transform 0.5s ease; width: 100%; height: 100%; object-fit: cover; }
+.img-zoom:hover img  { transform: scale(1.08); }
+
+/* Card hover */
+.card-hover           { transition: all 0.3s ease; }
+.card-hover:hover     { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.13); }
+
+/* Buttons */
+.btn-gold {
+  background: linear-gradient(135deg, #C9A84C, #E5C97A, #C9A84C);
+  background-size: 200%;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Jost', sans-serif;
+  font-weight: 600;
+}
+.btn-gold:hover {
+  background-position: right;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(201, 168, 76, 0.4);
+}
+
+.btn-black {
+  background: #0A0A0A;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Jost', sans-serif;
+}
+.btn-black:hover { background: #2a2a2a; transform: translateY(-1px); }
+
+.btn-wa {
+  background: #25D366;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-wa:hover { background: #20bf5b; }
+
+/* Hide scrollbar for horizontal scroll */
+.scroll-x                { overflow-x: auto; scrollbar-width: none; }
+.scroll-x::-webkit-scrollbar { display: none; }
+
+/* Page transition */
+.page-enter { animation: fadeUp 0.4s ease both; }
+
+/* Input */
+.input-gold {
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  padding: 10px 14px;
+  border-radius: 3px;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  transition: border-color 0.2s;
+  background: white;
+  outline: none;
+  width: 100%;
+}
+.input-gold:focus { border-color: var(--gold); }
+
+/* Range slider */
+input[type='range'] { accent-color: var(--gold); }
+input[type='checkbox'] { accent-color: var(--gold); }
+
+@layer utilities {
+  .font-playfair  { font-family: 'Playfair Display', serif; }
+  .font-cormorant { font-family: 'Cormorant Garamond', serif; }
+  .font-jost      { font-family: 'Jost', sans-serif; }
+}
