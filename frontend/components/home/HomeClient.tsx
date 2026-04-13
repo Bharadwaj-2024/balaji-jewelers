@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { productsAPI, categoriesAPI } from '@/lib/api';
 import ProductCard from '@/components/product/ProductCard';
 import { ProductCardSkeleton } from '@/components/ui/Skeleton';
+import SignatureAtelier from '@/components/home/SignatureAtelier';
 
 const OCCASIONS = [
   { name: 'Wedding',     emoji: '💍', bg: '#1a0800', href: '/products?occasion=Wedding' },
@@ -141,6 +142,8 @@ export default function HomeClient() {
           </div>
         </div>
       </section>
+
+      <SignatureAtelier />
 
       {/* ── Budget Filter ── */}
       <section className="py-16 px-7 bg-white">
