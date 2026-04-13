@@ -8,6 +8,7 @@ import { productsAPI, categoriesAPI } from '@/lib/api';
 import ProductCard from '@/components/product/ProductCard';
 import { ProductCardSkeleton } from '@/components/ui/Skeleton';
 import SignatureAtelier from '@/components/home/SignatureAtelier';
+import GoldBudgetPlanner from '@/components/home/GoldBudgetPlanner';
 
 const OCCASIONS = [
   { name: 'Wedding',     emoji: '💍', bg: '#1a0800', href: '/products?occasion=Wedding' },
@@ -162,6 +163,8 @@ export default function HomeClient() {
           </div>
         </div>
       </section>
+
+      <GoldBudgetPlanner />
 
       {/* ── Featured ── */}
       <section className="py-20 px-7 bg-ivory">
