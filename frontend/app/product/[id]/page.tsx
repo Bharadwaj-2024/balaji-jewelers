@@ -9,6 +9,7 @@ import { useCart }     from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useAuth }     from '@/context/AuthContext';
 import ProductCard     from '@/components/product/ProductCard';
+import PurityGoldRate  from '@/components/product/PurityGoldRate';
 import { TextSkeleton } from '@/components/ui/Skeleton';
 import toast from 'react-hot-toast';
 
@@ -64,6 +65,7 @@ export default function ProductDetailPage() {
 
   const price   = rates ? calcProductPrice(product.gold_weight, product.purity, product.making_charges, rates) : product.price;
   const goldCost = rates ? Math.round(product.gold_weight * (product.purity==='22k'?rates.rate_22k:product.purity==='18k'?rates.rate_18k:rates.rate_14k)) : 0;
+  const unitRate = product.purity === '22k' ? rates?.rate_22k : product.purity === '18k' ? rates?.rate_18k : rates?.rate_14k;
   const gst     = Math.round(price * 0.03);
   const inCart  = isInCart(product.id);
   const inWish  = isWished(product.id);
@@ -187,10 +189,12 @@ export default function ProductDetailPage() {
 
           <div className="gold-line mb-5" />
 
+          <PurityGoldRate purity={product.purity} rates={rates} />
+
           {/* Price breakdown */}
           <div className="bg-champ p-5 rounded-sm mb-5">
             <div className="text-[10px] text-gray-400 tracking-[1px] uppercase mb-3">Price Breakdown</div>
-            {[[`Gold Cost (${product.gold_weight}g × ${formatPrice(rates?.rate_22k||0)})`, formatPrice(goldCost)],['Making Charges', formatPrice(product.making_charges)],['GST (3%)', formatPrice(gst)]].map(([k,v])=>(
+            {[[`Gold Cost (${product.gold_weight}g × ${formatPrice(unitRate||0)})`, formatPrice(goldCost)],['Making Charges', formatPrice(product.making_charges)],['GST (3%)', formatPrice(gst)]].map(([k,v])=>(
               <div key={k} className="flex justify-between text-[13px] text-gray-500 mb-1.5"><span>{k}</span><span>{v}</span></div>
             ))}
             <div className="gold-line my-2" />
