@@ -1,251 +1,187 @@
-# 🪙 Balaji Jewellers — Full-Stack eCommerce
+# Balaji Jewellers
 
-> **"Crafted with Devotion, Worn with Pride"**
+Luxury gold jewellery eCommerce application built with Next.js 14, Express.js, and MySQL.
 
-A production-ready luxury gold jewellery eCommerce platform built with Next.js 14, Express.js, and MySQL.
+The website is designed around the Balaji Jewellers brand experience: a gold-themed storefront, product browsing, cart and checkout flows, customer authentication, wishlist support, and an admin area for managing products, orders, categories, coupons, and gold rates.
 
----
+## What The Application Includes
 
-## 🗂️ Project Structure
+### Storefront
 
-```
+- Animated hero banner on the home page
+- Balaji Promise trust section
+- Category browsing grid
+- New arrivals and featured products
+- Occasion-based shopping cards
+- Signature atelier section
+- Purity spotlight section
+- Gold budget planner using live rate data
+- Customer reviews and trust badges
+
+### Shopping Flow
+
+- Product listing with filters and search
+- Product detail page with pricing and purchase actions
+- Add to cart, buy now, and wishlist support
+- Cart quantity management
+- Checkout with saved addresses and coupon validation
+- Order placement and order history
+
+### Account And Admin
+
+- Login and registration
+- User session persistence through local storage and auth APIs
+- Admin dashboard for managing the catalogue and commerce data
+- Gold rate management
+- Coupon management
+
+## Tech Stack
+
+- Frontend: Next.js 14, React, TypeScript, Tailwind CSS, Framer Motion
+- Backend: Node.js, Express.js, MySQL, JWT, bcrypt
+- Media: Cloudinary
+- State and API: React Context, SWR, Axios, Zustand
+
+## Project Structure
+
+```text
 balaji-jewellers/
-├── frontend/        # Next.js 14 App Router
-├── backend/         # Express.js REST API
-├── database/        # MySQL schema + seed data
+├── frontend/        # Next.js app router frontend
+├── backend/         # Express REST API
+├── database/        # MySQL schema
 └── README.md
 ```
 
----
-
-## ✅ Features
-
-| Feature | Status |
-|---|---|
-| Responsive luxury UI (Playfair Display + Jost) | ✅ |
-| Hero carousel (3 slides, auto-rotate) | ✅ |
-| Live gold rate ticker (22K, 18K, 14K) | ✅ |
-| Category grid (Rings, Necklaces, Earrings, Bangles, Pendants, Chains) | ✅ |
-| Product listing with filters + sort + pagination | ✅ |
-| Product detail with image gallery, price breakdown | ✅ |
-| Dynamic price = gold weight × live rate + making charges | ✅ |
-| WhatsApp Order button (pre-filled message) | ✅ |
-| Add to Cart / Buy Now / Wishlist | ✅ |
-| Ring size selector | ✅ |
-| Cart with quantity control | ✅ |
-| Checkout with address management + coupon code | ✅ |
-| Order tracking with stepper | ✅ |
-| Wishlist (localStorage persistent) | ✅ |
-| JWT auth (httpOnly cookie + localStorage) | ✅ |
-| Admin dashboard: Overview, Products, Orders, Gold Rates, Users | ✅ |
-| Live gold rate update (admin) with 1-hour cache | ✅ |
-| Reviews system (rating + comment) | ✅ |
-| BIS Hallmark trust badges section | ✅ |
-| SEO metadata + OG tags | ✅ |
-| Skeleton loaders | ✅ |
-| Framer Motion page animations | ✅ |
-| Coupon system | ✅ |
-| bcrypt password hashing (salt 12) | ✅ |
-| Rate limiting (express-rate-limit) | ✅ |
-| MySQL prepared statements | ✅ |
-| Cloudinary image upload | ✅ |
-
----
-
-## 🚀 Setup — Step by Step
+## Local Setup
 
 ### 1. Prerequisites
 
-- Node.js ≥ 18
+- Node.js 18 or newer
 - MySQL 8+
-- Cloudinary account (free)
-
----
+- Cloudinary account
 
 ### 2. Database
 
+Import the schema into MySQL:
+
 ```bash
-# Create DB and run schema
 mysql -u root -p < database/schema.sql
 ```
-
-This creates all tables and inserts seed data including:
-- 6 categories
-- 12 sample products  
-- Admin user: `admin@balajijewellers.com` / `Admin@123`
-- 3 sample coupons: `BALAJI10`, `WELCOME500`, `WEDDING15`
-- Initial gold rates (22K: ₹6820, 18K: ₹5580, 14K: ₹4300)
-
----
 
 ### 3. Backend
 
 ```bash
 cd backend
 npm install
-cp .env.example .env
-# Edit .env with your values
 npm run dev
 ```
 
-**Required `.env` values:**
-```
+Create a `backend/.env` file with values like:
+
+```env
+PORT=5000
+NODE_ENV=development
 DB_HOST=localhost
+DB_PORT=3306
 DB_USER=root
 DB_PASS=your_password
 DB_NAME=balaji_jewellers
-JWT_SECRET=your_32_char_secret_key_here
+JWT_SECRET=your_secret_key
+FRONTEND_URL=http://localhost:3000
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
-FRONTEND_URL=http://localhost:3000
 ```
-
-API runs at: `http://localhost:5000`
-
----
 
 ### 4. Frontend
 
 ```bash
 cd frontend
 npm install
-cp .env.example .env.local
-# Edit .env.local
 npm run dev
 ```
 
-**Required `.env.local` values:**
-```
+Create a `frontend/.env.local` file with:
+
+```env
 NEXT_PUBLIC_API_URL=http://localhost:5000/api
 NEXT_PUBLIC_WHATSAPP_NUMBER=919876543210
 ```
 
-Frontend runs at: `http://localhost:3000`
+## Main Routes
 
----
+- `/` home page
+- `/products` product catalogue
+- `/product/[id]` product details
+- `/cart` cart
+- `/checkout` checkout
+- `/auth` login and registration
+- `/orders` order history
+- `/wishlist` wishlist
+- `/admin` admin dashboard
 
-## 📡 API Reference
+## API Overview
 
 ### Auth
-| Method | Endpoint | Auth |
-|--------|----------|------|
-| POST | `/api/auth/register` | — |
-| POST | `/api/auth/login` | — |
-| POST | `/api/auth/logout` | — |
-| GET | `/api/auth/me` | 🔒 |
-| PUT | `/api/auth/update-profile` | 🔒 |
-| PUT | `/api/auth/change-password` | 🔒 |
+
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/logout`
+- `GET /api/auth/me`
 
 ### Products
-| Method | Endpoint | Auth |
-|--------|----------|------|
-| GET | `/api/products?category=1&purity=22k&search=ring&sort=price&order=ASC&page=1&limit=12` | — |
-| GET | `/api/products/:id` | — |
-| POST | `/api/products` | 🔑 Admin |
-| PUT | `/api/products/:id` | 🔑 Admin |
-| DELETE | `/api/products/:id` | 🔑 Admin |
-| POST | `/api/products/:id/images` | 🔑 Admin |
 
-### Cart
-| Method | Endpoint | Auth |
-|--------|----------|------|
-| GET | `/api/cart` | 🔒 |
-| POST | `/api/cart/add` | 🔒 |
-| PUT | `/api/cart/update/:id` | 🔒 |
-| DELETE | `/api/cart/remove/:id` | 🔒 |
+- `GET /api/products`
+- `GET /api/products/:id`
+- `POST /api/products`
+- `PUT /api/products/:id`
+- `DELETE /api/products/:id`
 
-### Orders
-| Method | Endpoint | Auth |
-|--------|----------|------|
-| POST | `/api/orders` | 🔒 |
-| GET | `/api/orders` | 🔒 |
-| GET | `/api/orders/:id` | 🔒 |
-| PUT | `/api/orders/:id/status` | 🔑 Admin |
-| GET | `/api/admin/orders` | 🔑 Admin |
+### Cart And Orders
 
-### Gold Rates
-| Method | Endpoint | Auth |
-|--------|----------|------|
-| GET | `/api/gold-rates` | — |
-| PUT | `/api/gold-rates` | 🔑 Admin |
+- `GET /api/cart`
+- `POST /api/cart/add`
+- `PUT /api/cart/update/:id`
+- `DELETE /api/cart/remove/:id`
+- `POST /api/orders`
+- `GET /api/orders`
+- `GET /api/orders/:id`
 
----
+### Supporting Data
 
-## 🏗️ Production Deployment
+- `GET /api/categories`
+- `GET /api/gold-rates`
+- `GET /api/coupons`
 
-### Backend (AWS EC2)
-```bash
-npm install -g pm2
-pm2 start server.js --name balaji-api
-pm2 save && pm2 startup
-```
+## Home Page Sections
 
-### Frontend (Vercel — recommended)
-```bash
-cd frontend
-vercel deploy
-```
-Add your env vars in Vercel dashboard.
+The current home page is composed of these parts:
 
-### Database (AWS RDS)
-- Engine: MySQL 8.0
-- Update `DB_HOST` in backend `.env` to RDS endpoint
+- Hero banner
+- Balaji Promise section
+- Category browser
+- New arrivals
+- Occasion cards
+- Signature atelier
+- Purity spotlight
+- Budget planner
+- Featured pieces
+- Trust badges
+- Customer reviews
 
-### Images (Cloudinary — already integrated)
-- Upload images through Admin dashboard → Products → Upload Images
+## Verification
 
----
+The frontend builds successfully, and the backend starts successfully with the available MySQL configuration.
 
-## 🎨 Brand Colors
+## Brand Palette
 
-| Name | Hex |
-|------|-----|
-| Royal Gold | `#C9A84C` |
-| Deep Black | `#0A0A0A` |
-| Ivory White | `#FAF7F2` |
-| Soft Champagne | `#F5E6C8` |
+- Royal Gold: `#C9A84C`
+- Deep Black: `#0A0A0A`
+- Ivory: `#FAF7F2`
+- Champagne: `#F5E6C8`
 
----
+## Notes
 
-## 🔐 Security
-
-- Passwords: bcrypt (12 salt rounds)
-- JWT: httpOnly cookies + Authorization header
-- Rate limiting: 200 req/15min general, 20 req/15min for auth
-- Admin routes: role middleware protected
-- SQL: prepared statements (mysql2)
-- CORS: configured for specific origin
-
----
-
-## 📦 Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Frontend | Next.js 14 (App Router), TypeScript |
-| Styling | Tailwind CSS, Framer Motion |
-| State | Zustand / React Context |
-| Backend | Node.js, Express.js |
-| Database | MySQL 8 (mysql2) |
-| Auth | JWT (jsonwebtoken + bcrypt) |
-| Images | Cloudinary |
-| Deployment | Vercel (FE) + AWS EC2/RDS (BE) |
-
----
-
-## 💚 WhatsApp Integration
-
-The WhatsApp Order button generates a pre-filled message:
-```
-Hi, I'm interested in [Product Name] (SKU: BJ0001) 
-priced at ₹35,480 from Balaji Jewellers.
-```
-
-Update your WhatsApp number in:
-- Backend `.env`: `WHATSAPP_NUMBER=919876543210`
-- Frontend `.env.local`: `NEXT_PUBLIC_WHATSAPP_NUMBER=919876543210`
-
----
-
-*Built with ❤️ for Balaji Jewellers*
+- The site is optimized for a luxury jewellery shopping experience.
+- WhatsApp and checkout flows rely on the configured API and environment variables.
+- If you deploy to production, update `FRONTEND_URL`, `NEXT_PUBLIC_API_URL`, and your database credentials accordingly.
