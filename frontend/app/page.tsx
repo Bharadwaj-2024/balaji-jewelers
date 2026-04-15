@@ -2,6 +2,7 @@
 import type { Metadata } from 'next';
 import HeroBanner from '@/components/home/HeroBanner';
 import HomeClient from '@/components/home/HomeClient';
+import HeritagePromise from '@/components/home/HeritagePromise';
 
 export const metadata: Metadata = {
   title: 'Balaji Jewellers — BIS Hallmark Certified Gold Jewellery',
@@ -12,6 +13,7 @@ export default function HomePage() {
   return (
     <>
       <HeroBanner />
+      <HeritagePromise />
       <HomeClient />
     </>
   );
