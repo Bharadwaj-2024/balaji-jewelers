@@ -10,6 +10,7 @@ import { ProductCardSkeleton } from '@/components/ui/Skeleton';
 import SignatureAtelier from '@/components/home/SignatureAtelier';
 import GoldBudgetPlanner from '@/components/home/GoldBudgetPlanner';
 import PuritySpotlight from '@/components/home/PuritySpotlight';
+import StyleMatchmaker from '@/components/home/StyleMatchmaker';
 
 const OCCASIONS = [
   { name: 'Wedding',     emoji: '💍', bg: '#1a0800', href: '/products?occasion=Wedding' },
@@ -148,6 +149,8 @@ export default function HomeClient() {
       <SignatureAtelier />
 
       <PuritySpotlight />
+
+      <StyleMatchmaker />
 
       {/* ── Budget Filter ── */}
       <section className="py-16 px-7 bg-white">
