@@ -15,6 +15,7 @@ The website is designed around the Balaji Jewellers brand experience: a gold-the
 - Occasion-based shopping cards
 - Signature atelier section
 - Purity spotlight section
+- Interactive Style Matchmaker concierge for personalized style discovery
 - Gold budget planner using live rate data
 - Customer reviews and trust badges
 
@@ -164,10 +165,20 @@ The current home page is composed of these parts:
 - Occasion cards
 - Signature atelier
 - Purity spotlight
+- Style Matchmaker (occasion + purity + budget based recommendations)
 - Budget planner
 - Featured pieces
 - Trust badges
 - Customer reviews
+
+## New Feature Highlight: Style Matchmaker
+
+The home page now includes a high-engagement interactive concierge section called Style Matchmaker.
+
+- Shoppers select Occasion, Purity, and Budget using quick filter pills
+- The section reveals curated jewellery style directions with motion transitions
+- Each match includes a direct call-to-action that links to pre-filtered product listings
+- The feature is designed to improve discovery and keep visitors engaged longer on the home page
 
 ## Verification
 
