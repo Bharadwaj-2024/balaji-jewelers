@@ -44,7 +44,7 @@ export default function Navbar() {
 
         {/* Nav Links */}
         <div className="hidden md:flex gap-7 items-center">
-          {[['Collections', '/products'], ['Rings', '/products?category=1'], ['Necklaces', '/products?category=2'], ['Offers', '/products?is_featured=true'], ['About', '/']].map(([label, href]) => (
+          {[['Gold', '/products?purity=22k'], ['Silver', '/products?category=silver'], ['New Collection', '/products?is_new=true'], ['Offers', '/products?is_featured=true']].map(([label, href]) => (
             <Link key={label} href={href}
               className="text-white/70 text-[11px] tracking-[1.5px] uppercase font-medium hover:text-gold transition-colors border-b border-transparent hover:border-gold pb-0.5">
               {label}
@@ -139,7 +139,7 @@ export default function Navbar() {
       {/* Mobile menu */}
       {menuOpen && (
         <div className="md:hidden bg-black border-t border-gold/15 px-7 py-5 flex flex-col gap-4 animate-slide-down">
-          {[['Collections', '/products'], ['Rings', '/products?category=1'], ['Necklaces', '/products?category=2'], ['Offers', '/products?is_featured=true']].map(([label, href]) => (
+          {[['Gold', '/products?purity=22k'], ['Silver', '/products?category=silver'], ['New Collection', '/products?is_new=true'], ['Offers', '/products?is_featured=true']].map(([label, href]) => (
             <Link key={label} href={href} onClick={() => setMenuOpen(false)}
               className="text-white/70 text-[13px] tracking-[1.5px] uppercase">
               {label}

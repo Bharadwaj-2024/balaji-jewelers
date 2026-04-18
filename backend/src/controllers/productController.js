@@ -1,5 +1,6 @@
 // src/controllers/productController.js
 const pool           = require('../config/db');
+const mysql2         = require('mysql2');
 const { cloudinary } = require('../config/cloudinary');
 
 // GET /api/products
@@ -30,10 +31,16 @@ exports.getProducts = async (req, res) => {
   const sortCol       = allowedSorts[sort] || 'p.created_at';
   const sortOrder     = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
-  const offset = (parseInt(page) - 1) * parseInt(limit);
+  const limitInt = parseInt(limit);
+  const offset   = (parseInt(page) - 1) * limitInt;
 
-  const sql = `
-    SELECT
+  // Use mysql2.format() + pool.query() to avoid the "Incorrect arguments to
+  // mysqld_stmt_execute" error that occurs with pool.execute() when mixing
+  // filter params (string) with LIMIT/OFFSET (integer) in complex queries.
+  const whereSql = conditions.join(' AND ');
+
+  const mainSql = mysql2.format(
+    `SELECT
       p.*,
       c.name AS category_name,
       (SELECT image_url FROM product_images WHERE product_id = p.id AND is_primary = 1 LIMIT 1) AS primary_image,
@@ -42,19 +49,21 @@ exports.getProducts = async (req, res) => {
       COUNT(DISTINCT r.id) AS review_count
     FROM products p
     LEFT JOIN categories c ON p.category_id = c.id
-    LEFT JOIN reviews r ON r.product_id = p.id
-    WHERE ${conditions.join(' AND ')}
+    LEFT JOIN reviews r    ON r.product_id  = p.id
+    WHERE ${whereSql}
     GROUP BY p.id
     ORDER BY ${sortCol} ${sortOrder}
-    LIMIT ? OFFSET ?
-  `;
-  params.push(parseInt(limit), offset);
+    LIMIT ? OFFSET ?`,
+    [...params, limitInt, offset]
+  );
 
-  const [products] = await pool.execute(sql, params);
+  const countSql = mysql2.format(
+    `SELECT COUNT(DISTINCT p.id) AS total FROM products p WHERE ${whereSql}`,
+    params
+  );
 
-  // Total count
-  const countSql = `SELECT COUNT(DISTINCT p.id) AS total FROM products p WHERE ${conditions.join(' AND ')}`;
-  const [countRows] = await pool.execute(countSql, params.slice(0, -2));
+  const [products]  = await pool.query(mainSql);
+  const [countRows] = await pool.query(countSql);
   const total = countRows[0].total;
 
   res.json({
@@ -63,8 +72,8 @@ exports.getProducts = async (req, res) => {
     pagination: {
       total,
       page:       parseInt(page),
-      limit:      parseInt(limit),
-      totalPages: Math.ceil(total / parseInt(limit)),
+      limit:      limitInt,
+      totalPages: Math.ceil(total / limitInt),
     },
   });
 };
