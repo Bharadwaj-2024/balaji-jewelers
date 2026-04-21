@@ -20,6 +20,7 @@ export default function CheckoutPage() {
   const [couponApplied, setCouponApplied] = useState(false);
   const [placing,     setPlacing]     = useState(false);
   const [ordered,     setOrdered]     = useState<number | null>(null);
+  const [invoiceNo,   setInvoiceNo]   = useState('');
 
   // New address form
   const [newAddr, setNewAddr] = useState({ full_name: user?.name||'', phone: user?.phone||'', address_line1: '', address_line2: '', city: '', state: '', pincode: '', is_default: false });
@@ -70,6 +71,7 @@ export default function CheckoutPage() {
       });
       clearCart();
       setOrdered(data.orderId);
+      if (data.invoiceNo) setInvoiceNo(data.invoiceNo);
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to place order');
     } finally {
@@ -81,10 +83,12 @@ export default function CheckoutPage() {
     <div className="max-w-[560px] mx-auto px-7 py-20 text-center">
       <div className="text-7xl mb-6">🎉</div>
       <h2 className="font-playfair text-3xl font-bold mb-3">Order Placed!</h2>
-      <p className="text-gray-500 mb-2">Order #{ordered} confirmed.</p>
+      <p className="text-gray-500 mb-1">Order #{ordered} confirmed.</p>
+      {invoiceNo && <p className="text-amber-600 text-sm font-semibold mb-1">Invoice: {invoiceNo}</p>}
       <p className="text-gray-400 text-sm mb-8">You'll receive a confirmation WhatsApp / email shortly.</p>
-      <div className="flex gap-4 justify-center">
-        <button onClick={() => router.push('/orders')} className="btn-gold px-6 py-3 text-black font-semibold text-sm rounded-sm">View Orders</button>
+      <div className="flex gap-3 justify-center flex-wrap">
+        <button onClick={() => router.push(`/orders/${ordered}/invoice`)} className="btn-gold px-6 py-3 text-black font-bold text-sm rounded-sm">🧾 View Bill</button>
+        <button onClick={() => router.push('/orders')} className="border border-gray-300 px-6 py-3 text-gray-700 font-semibold text-sm rounded-sm hover:bg-gray-50">📦 My Orders</button>
         <button onClick={() => router.push('/products')} className="btn-black px-6 py-3 text-white text-sm rounded-sm">Continue Shopping</button>
       </div>
     </div>

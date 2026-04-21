@@ -70,11 +70,12 @@ export const wishlistAPI = {
 };
 
 export const ordersAPI = {
-  create:     (data: any)               => api.post('/orders', data),
-  getMy:      ()                        => api.get('/orders'),
-  getById:    (id: string | number)     => api.get(`/orders/${id}`),
-  updateStatus: (id: number, data: any) => api.put(`/orders/${id}/status`, data),
-  getAll:     (params?: any)            => api.get('/admin/orders', { params }),
+  create:       (data: any)               => api.post('/orders', data),
+  getMy:        ()                        => api.get('/orders'),
+  getById:      (id: string | number)     => api.get(`/orders/${id}`),
+  getInvoice:   (id: string | number)     => api.get(`/orders/${id}/invoice`),
+  updateStatus: (id: number, data: any)   => api.put(`/orders/${id}/status`, data),
+  getAll:       (params?: any)            => api.get('/admin/orders', { params }),
 };
 
 export const reviewsAPI = {

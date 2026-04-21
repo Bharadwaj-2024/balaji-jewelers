@@ -113,6 +113,28 @@ CREATE TABLE order_items (
   FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
+-- Order Bills (invoice snapshot — saved once at order creation)
+CREATE TABLE order_bills (
+  id              INT AUTO_INCREMENT PRIMARY KEY,
+  order_id        INT NOT NULL UNIQUE,
+  invoice_no      VARCHAR(30) NOT NULL,        -- e.g. BJ-2024-00001
+  customer_name   VARCHAR(100) NOT NULL,
+  customer_email  VARCHAR(150),
+  customer_phone  VARCHAR(15),
+  delivery_address TEXT,                        -- full address as formatted string
+  items_json      JSON NOT NULL,               -- snapshot of items at time of order
+  subtotal        DECIMAL(10,2),
+  making_charges  DECIMAL(10,2),
+  discount        DECIMAL(10,2) DEFAULT 0,
+  gst             DECIMAL(10,2),
+  shipping        DECIMAL(10,2) DEFAULT 0,
+  total_amount    DECIMAL(10,2),
+  payment_method  VARCHAR(20),
+  coupon_code     VARCHAR(50),
+  bill_date       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+);
+
 -- Reviews
 CREATE TABLE reviews (
   id          INT AUTO_INCREMENT PRIMARY KEY,
@@ -186,6 +208,7 @@ CREATE INDEX idx_products_featured  ON products(is_featured);
 CREATE INDEX idx_order_items_order  ON order_items(order_id);
 CREATE INDEX idx_reviews_product    ON reviews(product_id);
 CREATE INDEX idx_cart_items_cart    ON cart_items(cart_id);
+CREATE INDEX idx_order_bills_order  ON order_bills(order_id);
 
 -- ======================== SEED DATA ========================
 
