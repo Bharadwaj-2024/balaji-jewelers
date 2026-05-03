@@ -1,0 +1,49 @@
+================================================================
+BALAJI JEWELLERS — Product Image Links
+================================================================
+Paste ONE direct image URL next to each product.
+Use links that end in .jpg, .png, .webp or from CDNs like
+i.pinimg.com, m.media-amazon.com, rukminim2.flixcart.com etc.
+================================================================
+
+── RINGS ──────────────────────────────────────────────────
+
+1)  Royal Kundan Bridal Ring      (id=1)  : 
+2)  Diamond Cut Ring 18K          (id=7)  : 
+3)  Twisted Band Ring 22K         (id=15) : 
+4)  Floral Cluster Ring 18K       (id=16) : 
+
+── NECKLACES ──────────────────────────────────────────────
+
+5)  Peacock Polki Necklace        (id=2)  : 
+6)  Lakshmi Coin Necklace         (id=8)  : 
+7)  Layered Beads Necklace 22K    (id=19) : 
+8)  Coin Choker Necklace 18K      (id=20) : 
+
+── EARRINGS ───────────────────────────────────────────────
+
+9)  Temple Jhumka Earrings        (id=3)  : 
+10) Pearl Drop Earrings 18K       (id=9)  : 
+11) Chandbali Earrings 22K        (id=23) : 
+12) Hoop Earrings 18K             (id=24) : 
+
+── BANGLES ────────────────────────────────────────────────
+
+13) Gold Bangle Set 6pc           (id=4)  : 
+14) Antique Kada Bangle           (id=10) : 
+15) Slim Gold Bangle 22K          (id=27) : 
+16) Designer Diamond Bangle 18K   (id=28) : 
+
+── PENDANTS ───────────────────────────────────────────────
+
+17) Om Pendant 18K                (id=5)  : 
+18) Ganesha Pendant 22K           (id=11) : 
+19) Heart Pendant 18K             (id=31) : 
+20) Evil Eye Pendant 18K          (id=32) : 
+
+── CHAINS ─────────────────────────────────────────────────
+
+21) Wheat Chain 22K               (id=6)  : 
+22) Singapore Chain 22K           (id=12) : 
+23) Box Chain 18K                 (id=35) : 
+24) Rope Chain 22K                (id=36) : 

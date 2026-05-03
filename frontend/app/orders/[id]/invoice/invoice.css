@@ -1,0 +1,8 @@
+/* Invoice Page Styles */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap');
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff !important; }
+  .invoice-wrap { box-shadow: none !important; margin: 0 !important; }
+}

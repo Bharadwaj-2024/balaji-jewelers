@@ -143,4 +143,39 @@ INSERT INTO coupons (code, discount_type, discount_value, min_order) VALUES
   ('WEDDING15',  'percent', 15,  50000)
 ON DUPLICATE KEY UPDATE discount_value = VALUES(discount_value);
 
+-- ── Product Images (all categories) ──────────────────────
+-- Resolved from user-provided Bing Image links
+INSERT INTO product_images (product_id, image_url, is_primary, sort_order) VALUES
+  -- RINGS
+  (1,  'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&h=600&fit=crop', TRUE, 0),
+  (7,  'https://i.pinimg.com/originals/32/53/b5/3253b589b9456afebe65a4156d03a5f0.jpg', TRUE, 0),
+  (15, 'https://a.1stdibscdn.com/284-carat-oval-cut-ethiopian-opal-diamond-yellow-gold-ring-for-sale-picture-3/j_7993/j_113845121611710661109/OP44_C_master.jpg?width=768', TRUE, 0),
+  (16, 'https://a.1stdibscdn.com/18k-yellow-gold-2-carat-oval-cut-natural-diamond-eternity-ring-for-sale/j_27122/j_169763121663101790447/j_16976312_1663101791157_bg_processed.jpg', TRUE, 0),
+  -- NECKLACES
+  (2,  'https://www.southjewellery.com/wp-content/uploads/2022/11/victorian-polki-necklace-20-scaled.jpg', TRUE, 0),
+  (8,  'https://www.chidambaramgoldcovering.com/image/cache/catalog/ChidambaramGoldCovering/necklace/nckn3204-plain-gold-kasu-one-gram-gold-necklace-shop-online-1-1700x2000.jpg', TRUE, 0),
+  (19, 'https://www.southjewellery.com/wp-content/uploads/2020/07/layered-emerald-beads-satlada-necklace-519x600.jpg', TRUE, 0),
+  (20, 'https://di2ponv0v5otw.cloudfront.net/posts/2023/08/11/64d639159e4f745cf84a1165/m_64d6398497b5d085fb8546c2.jpeg', TRUE, 0),
+  -- EARRINGS
+  (3,  'https://th.bing.com/th/id/R.b684157cbdf172ebd6f1a06a5ef9b14b?rik=BMTmuyMNXyXGkw&pid=ImgRaw&r=0', TRUE, 0),
+  (9,  'https://product-images.therealreal.com/EARRI185398_2_enlarged.jpg', TRUE, 0),
+  (23, 'https://www.bhindi.com/upload/product/ER-1986.jpg', TRUE, 0),
+  (24, 'https://a.1stdibscdn.com/lb-exclusive-18k-yellow-gold-20ct-diamond-inside-out-hoop-earrings-for-sale/j_682/j_196169221687289014793/j_19616922_1687289015740_bg_processed.jpg', TRUE, 0),
+  -- BANGLES
+  (4,  'https://www.meenajewelers.com/thumbFull/images/4_BangleSets_22K_19742.jpg', TRUE, 0),
+  (10, 'https://shop.southindiajewels.com/wp-content/uploads/2025/09/Antique-Kada-Bangle-SMAIB00656-6-768x768.jpg', TRUE, 0),
+  (27, 'https://queensdiamond.com/wp-content/uploads/2024/03/Untitleddesign-2023-12-14T155059.901-1-600x600.png', TRUE, 0),
+  (28, 'https://www.borsheims.com/mm5/graphics/00000001/52/3DIBY0516A.jpg', TRUE, 0),
+  -- PENDANTS
+  (5,  'https://cdn.shopify.com/s/files/1/0763/1281/products/P27849-18KVEW_1200x.jpg?v=1537213066', TRUE, 0),
+  (11, 'https://www.bhindi.com/upload/product/Pen-365.webp', TRUE, 0),
+  (31, 'https://a.1stdibscdn.com/diamond-accented-18-karat-yellow-gold-heart-pendant-necklace-for-sale/j_11951/j_171398621664468764615/j_17139862_1664468765783_bg_processed.jpg?width=768', TRUE, 0),
+  (32, 'https://www.engraversguild.co.uk/wp-content/uploads/2024/04/Steel-Evil-Eye-Front-Gold.jpg', TRUE, 0),
+  -- CHAINS
+  (6,  'https://i.etsystatic.com/13771922/r/il/09956e/4250269094/il_1080xN.4250269094_5dxv.jpg', TRUE, 0),
+  (12, 'https://www.goldstardiamonds.ca/wp-content/uploads/2024/10/img_1351.jpeg', TRUE, 0),
+  (35, 'https://i.etsystatic.com/34509128/r/il/b2c537/4834114050/il_794xN.4834114050_dpf6.jpg', TRUE, 0),
+  (36, 'https://i.ebayimg.com/images/g/8qgAAOSwQA9nqGq4/s-l1600.jpg', TRUE, 0)
+ON DUPLICATE KEY UPDATE image_url = VALUES(image_url);
+
 SELECT 'Seed complete! Tables populated successfully.' AS status;

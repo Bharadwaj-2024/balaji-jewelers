@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ordersAPI, formatPrice } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import './invoice.css';
 
 interface InvoiceItem {
   name:           string;
@@ -76,16 +77,6 @@ export default function InvoicePage() {
 
   return (
     <>
-      {/* Print / Screen styles */}
-      <style>{`
-        @media print {
-          .no-print { display: none !important; }
-          body { background: #fff !important; }
-          .invoice-wrap { box-shadow: none !important; margin: 0 !important; }
-        }
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap');
-      `}</style>
-
       {/* Action buttons */}
       <div className="no-print flex gap-3 justify-center mt-8 mb-6">
         <button onClick={() => router.back()}

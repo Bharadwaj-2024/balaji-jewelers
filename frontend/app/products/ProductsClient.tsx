@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { productsAPI, categoriesAPI } from '@/lib/api';
 import ProductCard from '@/components/product/ProductCard';
 import { ProductCardSkeleton } from '@/components/ui/Skeleton';
+import './products.css';
 
 const PURITIES  = ['22k','18k','14k'];
 const OCCASIONS = ['Wedding','Daily Wear','Festive','Anniversary'];
@@ -136,90 +137,6 @@ export default function ProductsClient() {
 
   return (
     <>
-      <style>{`
-        .filter-card {
-          background: #fff;
-          border: 1px solid rgba(201,168,76,0.15);
-          border-radius: 10px;
-          padding: 20px;
-          box-shadow: 0 2px 16px rgba(0,0,0,0.04);
-        }
-        .search-filter {
-          width: 100%;
-          padding: 10px 14px 10px 38px;
-          border: 1.5px solid rgba(201,168,76,0.3);
-          border-radius: 8px;
-          font-family: 'Jost', sans-serif;
-          font-size: 13px;
-          background: #faf7f0;
-          outline: none;
-          transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .search-filter:focus {
-          border-color: #C9A84C;
-          background: #fff;
-          box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
-        }
-        .sort-select {
-          padding: 9px 32px 9px 14px;
-          border: 1.5px solid rgba(201,168,76,0.3);
-          border-radius: 8px;
-          font-family: 'Jost', sans-serif;
-          font-size: 12px;
-          background: #fff;
-          outline: none;
-          cursor: pointer;
-          appearance: none;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath fill='%23C9A84C' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-          background-repeat: no-repeat;
-          background-position: right 10px center;
-          transition: border-color 0.2s;
-        }
-        .sort-select:focus { border-color: #C9A84C; }
-        .price-input {
-          width: 100%; padding: 8px 10px;
-          border: 1.5px solid rgba(201,168,76,0.25);
-          border-radius: 7px; font-family:'Jost',sans-serif; font-size: 12px;
-          background: #faf7f0; outline: none; transition: border-color 0.2s;
-        }
-        .price-input:focus { border-color: #C9A84C; background: #fff; }
-        .badge-filter {
-          display: inline-flex; align-items: center; gap: 4px;
-          background: #faf7f0; border: 1px solid rgba(201,168,76,0.4);
-          padding: 3px 10px 3px 8px; border-radius: 20px;
-          font-size: 11px; color: #7a5c00; font-family:'Jost',sans-serif; font-weight:600;
-          cursor: pointer; transition: all 0.15s;
-        }
-        .badge-filter:hover { background: #f5e6c8; border-color: #C9A84C; }
-        .clear-all-btn {
-          padding: 7px 16px; border-radius: 8px;
-          background: linear-gradient(135deg, #C9A84C, #E5C97A);
-          border: none; color: #1a1a1a; font-family:'Jost',sans-serif;
-          font-size: 11px; font-weight: 700; cursor: pointer;
-          letter-spacing: 0.5px; transition: all 0.2s;
-        }
-        .clear-all-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(201,168,76,0.3); }
-        .toggle-pill {
-          display: flex; align-items: center; gap: 8px;
-          padding: 8px 14px; border-radius: 8px; cursor: pointer;
-          border: 1.5px solid transparent; transition: all 0.2s;
-          font-family:'Jost',sans-serif; font-size: 13px; font-weight:500;
-        }
-        .toggle-pill.active {
-          background: linear-gradient(135deg,rgba(201,168,76,0.15),rgba(229,201,122,0.15));
-          border-color: rgba(201,168,76,0.5); color: #7a5c00; font-weight:700;
-        }
-        .toggle-pill:not(.active) { background: #f9f6f0; color: #666; border-color: transparent; }
-        .toggle-pill:hover { border-color: rgba(201,168,76,0.4); }
-        /* Custom pill toggle switch */
-        .pill-switch { width:36px; height:20px; border-radius:10px; position:relative; flex-shrink:0; transition:background 0.2s; cursor:pointer; }
-        .pill-switch-on  { background: linear-gradient(135deg,#C9A84C,#E5C97A); }
-        .pill-switch-off { background: #ddd; }
-        .pill-knob { width:14px; height:14px; border-radius:50%; background:#fff; position:absolute; top:3px; transition:left 0.2s; box-shadow:0 1px 4px rgba(0,0,0,0.2); }
-        .pill-knob-on  { left:19px; }
-        .pill-knob-off { left:3px; }
-      `}</style>
-
       <div className="max-w-[1200px] mx-auto px-7 py-8">
         <div className="flex gap-7">
 

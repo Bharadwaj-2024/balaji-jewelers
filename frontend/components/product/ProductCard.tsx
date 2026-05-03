@@ -1,11 +1,11 @@
 'use client';
 // components/product/ProductCard.tsx
-import Image from 'next/image';
 import Link  from 'next/link';
 import { formatPrice }  from '@/lib/api';
 import { useCart }      from '@/context/CartContext';
 import { useWishlist }  from '@/context/WishlistContext';
 import { useRouter }    from 'next/navigation';
+import './ProductCard.css';
 
 interface Props {
   product: {
@@ -73,65 +73,18 @@ export default function ProductCard({ product: p, mini = false }: Props) {
 
   return (
     <>
-      <style>{`
-        .pc-card { transition: transform 0.28s ease, box-shadow 0.28s ease; }
-        .pc-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.13); }
-        .pc-img-container { overflow: hidden; }
-        .pc-img-container img { transition: transform 0.5s ease; }
-        .pc-card:hover .pc-img-container img { transform: scale(1.07); }
-        .pc-add-btn {
-          flex: 1; padding: 10px;
-          font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 700;
-          border: none; cursor: pointer; border-radius: 6px;
-          transition: all 0.2s; letter-spacing: 0.3px;
-        }
-        .pc-add-btn.added {
-          background: #1a1a1a; color: #C9A84C;
-        }
-        .pc-add-btn.not-added {
-          background: linear-gradient(135deg, #C9A84C, #E5C97A, #C9A84C);
-          background-size: 200%; color: #1a1a1a;
-        }
-        .pc-add-btn.not-added:hover {
-          background-position: right;
-          box-shadow: 0 4px 14px rgba(201,168,76,0.4);
-          transform: translateY(-1px);
-        }
-        .pc-buy-btn {
-          flex: 1; padding: 10px;
-          font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 700;
-          background: #1a1a1a; color: #fff; border: none;
-          cursor: pointer; border-radius: 6px;
-          transition: all 0.2s; letter-spacing: 0.3px;
-        }
-        .pc-buy-btn:hover { background: #333; transform: translateY(-1px); }
-        .pc-wish-btn {
-          width: 34px; height: 34px; border-radius: 50%;
-          background: rgba(255,255,255,0.92);
-          border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-          transition: transform 0.2s, box-shadow 0.2s; backdrop-filter: blur(4px);
-        }
-        .pc-wish-btn:hover { transform: scale(1.18); box-shadow: 0 4px 12px rgba(0,0,0,0.18); }
-        .purity-badge {
-          display: inline-flex; align-items: center; gap: 3px;
-          padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700;
-          font-family: 'Jost', sans-serif; letter-spacing: 0.5px;
-        }
-      `}</style>
-
       <div className="pc-card bg-white rounded-[10px] overflow-hidden relative" style={{ border:'1px solid rgba(201,168,76,0.1)' }}>
 
         {/* Badges */}
         <div style={{ position:'absolute', top:10, left:10, zIndex:10, display:'flex', flexDirection:'column', gap:4 }}>
-          {p.is_new && (
+          {Boolean(p.is_new) && (
             <span style={{
               background:'linear-gradient(135deg,#C9A84C,#E5C97A)', color:'#1a1a1a',
               fontSize:9, fontWeight:800, letterSpacing:2, padding:'3px 8px', borderRadius:4,
               fontFamily:"'Jost',sans-serif", boxShadow:'0 2px 8px rgba(201,168,76,0.4)',
             }}>NEW</span>
           )}
-          {p.is_featured && (
+          {Boolean(p.is_featured) && (
             <span style={{
               background:'#1a1a1a', color:'#C9A84C',
               fontSize:9, fontWeight:800, letterSpacing:1.5, padding:'3px 8px', borderRadius:4,
@@ -163,14 +116,15 @@ export default function ProductCard({ product: p, mini = false }: Props) {
             height: mini ? 180 : 220,
             background:'linear-gradient(135deg,#faf5e8,#f0e8d0)',
             position:'relative',
+            overflow:'hidden',
           }}>
             {p.primary_image ? (
-              <Image
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
                 src={p.primary_image}
                 alt={p.name}
-                fill
-                sizes="(max-width: 768px) 100vw, 25vw"
-                className="object-cover"
+                style={{ width:'100%', height:'100%', objectFit:'cover' }}
+                loading="lazy"
               />
             ) : (
               <div style={{
@@ -226,7 +180,7 @@ export default function ProductCard({ product: p, mini = false }: Props) {
             </div>
 
             {/* Rating */}
-            {p.avg_rating !== undefined && p.avg_rating > 0 && (
+            {p.avg_rating !== undefined && Number(p.avg_rating) > 0 && (
               <div style={{ display:'flex', alignItems:'center', gap:4, marginBottom:8 }}>
                 {Array.from({ length: 5 }, (_, i) => (
                   <svg key={i} width="11" height="11" viewBox="0 0 24 24"
