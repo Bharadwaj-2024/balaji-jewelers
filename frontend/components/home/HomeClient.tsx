@@ -2,7 +2,6 @@
 // components/home/HomeClient.tsx
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { productsAPI, categoriesAPI } from '@/lib/api';
 import ProductCard from '@/components/product/ProductCard';
@@ -91,7 +90,8 @@ export default function HomeClient() {
                     <Link href={`/products?category=${c.id}`}
                       className="img-zoom card-hover relative aspect-[3/4] block rounded-sm overflow-hidden border border-gold/15 cursor-pointer">
                       {c.image_url
-                        ? <Image src={c.image_url} alt={c.name} fill className="object-cover" />
+                        ? /* eslint-disable-next-line @next/next/no-img-element */
+                          <img src={c.image_url} alt={c.name} style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} loading="lazy" />
                         : <div className="w-full h-full bg-gradient-to-b from-[#1a0f00] to-[#0a0500]" />}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/85 to-transparent" />
                       <div className="absolute bottom-3 left-0 right-0 text-center">

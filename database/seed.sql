@@ -11,13 +11,13 @@ VALUES (6820.00, 5580.00, 4300.00);
 
 -- ── Categories ───────────────────────────────────────────
 INSERT INTO categories (name, description, image_url) VALUES
-  ('Rings',     'Beautiful gold rings for every occasion',   '/images/cats/rings.jpg'),
-  ('Necklaces', 'Elegant necklaces and harams',              '/images/cats/necklaces.jpg'),
-  ('Earrings',  'Jhumkas, studs, drops and more',            '/images/cats/earrings.jpg'),
-  ('Bangles',   'Traditional and modern gold bangles',       '/images/cats/bangles.jpg'),
-  ('Pendants',  'Gold pendants for every belief',            '/images/cats/pendants.jpg'),
-  ('Chains',    'Lightweight everyday gold chains',          '/images/cats/chains.jpg')
-ON DUPLICATE KEY UPDATE name = VALUES(name);
+  ('Rings',     'Beautiful gold rings for every occasion',   'https://i.pinimg.com/originals/32/53/b5/3253b589b9456afebe65a4156d03a5f0.jpg'),
+  ('Necklaces', 'Elegant necklaces and harams',              'https://www.southjewellery.com/wp-content/uploads/2022/11/victorian-polki-necklace-20-scaled.jpg'),
+  ('Earrings',  'Jhumkas, studs, drops and more',            'https://www.bhindi.com/upload/product/ER-1986.jpg'),
+  ('Bangles',   'Traditional and modern gold bangles',       'https://www.meenajewelers.com/thumbFull/images/4_BangleSets_22K_19742.jpg'),
+  ('Pendants',  'Gold pendants for every belief',            'https://cdn.shopify.com/s/files/1/0763/1281/products/P27849-18KVEW_1200x.jpg?v=1537213066'),
+  ('Chains',    'Lightweight everyday gold chains',          'https://i.etsystatic.com/13771922/r/il/09956e/4250269094/il_1080xN.4250269094_5dxv.jpg')
+ON DUPLICATE KEY UPDATE name = VALUES(name), image_url = VALUES(image_url);
 
 -- ── Products ─────────────────────────────────────────────
 -- Price formula: gold_weight × gold_rate + making_charges

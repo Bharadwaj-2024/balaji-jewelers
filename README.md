@@ -1,84 +1,85 @@
-# Balaji Jewellers
+# 👑 Balaji Jewellers
 
-Luxury gold jewellery eCommerce application built with Next.js 14, Express.js, and MySQL.
+![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat&logo=next.js)
+![React](https://img.shields.io/badge/React-18-blue?style=flat&logo=react)
+![Node.js](https://img.shields.io/badge/Node.js-18+-green?style=flat&logo=node.js)
+![Express](https://img.shields.io/badge/Express.js-Backend-lightgrey?style=flat&logo=express)
+![MySQL](https://img.shields.io/badge/MySQL-8.0+-blue?style=flat&logo=mysql)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=flat&logo=tailwind-css)
 
-The website is designed around the Balaji Jewellers brand experience: a gold-themed storefront, product browsing, cart and checkout flows, customer authentication, wishlist support, and an admin area for managing products, orders, categories, coupons, and gold rates.
+A premium, luxury gold jewellery eCommerce web application designed to deliver an exquisite shopping experience. Built with a modern tech stack including **Next.js 14**, **Express.js**, and **MySQL**, the platform is crafted to reflect the elegant Balaji Jewellers brand.
 
-## What The Application Includes
+---
 
-### Storefront
+## ✨ Key Features
 
-- Animated hero banner on the home page
-- Balaji Promise trust section
-- Category browsing grid
-- New arrivals and featured products
-- Occasion-based shopping cards
-- Signature atelier section
-- Purity spotlight section
-- Interactive Style Matchmaker concierge for personalized style discovery
-- Gold budget planner using live rate data
-- Customer reviews and trust badges
+### 🏪 Storefront & User Experience
+- **Immersive Hero Section:** Animated hero banner welcoming users to the storefront.
+- **Balaji Promise:** Trust badges and guarantees prominent on the home page.
+- **Dynamic Browsing:** Category grid, new arrivals, featured products, and occasion-based shopping cards.
+- **Purity Spotlight & Atelier:** Signature sections highlighting craftsmanship and gold purity.
+- **Interactive Style Matchmaker:** A personalized concierge feature that recommends styles based on Occasion, Purity, and Budget using quick filter pills and smooth motion transitions.
+- **Gold Budget Planner:** Real-time budget calculator using live gold rate data.
+- **Customer Reviews:** Trust-building testimonials and ratings.
 
-### Shopping Flow
+### 🛍️ Shopping Flow
+- **Product Discovery:** Advanced product listing with search, filtering, and native `<img>` rendering for robust external URL image loading without artifacts.
+- **Detailed Product Pages:** Comprehensive item details, live pricing, and direct purchase actions.
+- **Cart & Wishlist:** Seamless "Add to Cart", "Buy Now", and Wishlist functionalities.
+- **Checkout:** Streamlined checkout process with saved addresses, coupon validation, and invoice generation.
+- **Order Management:** Secure order placement and user order history tracking.
 
-- Product listing with filters and search
-- Product detail page with pricing and purchase actions
-- Add to cart, buy now, and wishlist support
-- Cart quantity management
-- Checkout with saved addresses and coupon validation
-- Order placement and order history
+### 🔐 Account & Administration
+- **Authentication:** Secure login and registration using JWT and bcrypt, with session persistence.
+- **Admin Dashboard:** Comprehensive control panel for catalogue management.
+- **Data Management:** Control over products, categories, orders, coupons, and live gold rates.
+- **Database Architecture:** Robust MySQL schema encompassing core entities: Users, Products, Orders, Categories, Coupons, and Payments.
 
-### Account And Admin
+---
 
-- Login and registration
-- User session persistence through local storage and auth APIs
-- Admin dashboard for managing the catalogue and commerce data
-- Gold rate management
-- Coupon management
+## 🛠️ Tech Stack
 
-## Tech Stack
+- **Frontend:** Next.js 14 (App Router), React, TypeScript, Tailwind CSS, Framer Motion
+- **Backend:** Node.js, Express.js, JWT, bcrypt
+- **Database:** MySQL 8+ (Relational Architecture)
+- **Media Handling:** Cloudinary, native HTML5 `<img>` elements for seamless external image rendering.
+- **State Management & Data Fetching:** React Context, Zustand, SWR, Axios
 
-- Frontend: Next.js 14, React, TypeScript, Tailwind CSS, Framer Motion
-- Backend: Node.js, Express.js, MySQL, JWT, bcrypt
-- Media: Cloudinary
-- State and API: React Context, SWR, Axios, Zustand
+---
 
-## Project Structure
+## 📂 Project Structure
 
 ```text
 balaji-jewellers/
-├── frontend/        # Next.js app router frontend
-├── backend/         # Express REST API
-├── database/        # MySQL schema
-└── README.md
+├── frontend/        # Next.js 14 App Router frontend application
+├── backend/         # Express.js REST API server
+├── database/        # MySQL schema, seed files, and ER diagrams
+└── README.md        # Project documentation
 ```
 
-## Local Setup
+---
+
+## 🚀 Local Development Setup
 
 ### 1. Prerequisites
+- **Node.js** (v18 or newer)
+- **MySQL** (v8.0 or newer)
+- **Cloudinary** account (for media storage)
 
-- Node.js 18 or newer
-- MySQL 8+
-- Cloudinary account
-
-### 2. Database
-
-Import the schema into MySQL:
-
+### 2. Database Initialization
+Create the database and import the core schema:
 ```bash
 mysql -u root -p < database/schema.sql
 ```
 
-### 3. Backend
-
+### 3. Backend Setup
+Navigate to the backend directory, install dependencies, and start the development server.
 ```bash
 cd backend
 npm install
 npm run dev
 ```
-
-Create a `backend/.env` file with values like:
-
+**Environment Variables (`backend/.env`):**
 ```env
 PORT=5000
 NODE_ENV=development
@@ -94,105 +95,49 @@ CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 ```
 
-### 4. Frontend
-
+### 4. Frontend Setup
+Navigate to the frontend directory, install dependencies, and start the Next.js server.
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-
-Create a `frontend/.env.local` file with:
-
+**Environment Variables (`frontend/.env.local`):**
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:5000/api
 NEXT_PUBLIC_WHATSAPP_NUMBER=919876543210
 ```
 
-## Main Routes
+---
 
-- `/` home page
-- `/products` product catalogue
-- `/product/[id]` product details
-- `/cart` cart
-- `/checkout` checkout
-- `/auth` login and registration
-- `/orders` order history
-- `/wishlist` wishlist
-- `/admin` admin dashboard
+## 🧭 Core Navigation Routes
 
-## API Overview
+- `/` - Storefront Home
+- `/products` - Complete Catalogue
+- `/product/[id]` - Product Details
+- `/cart` - Shopping Cart
+- `/checkout` - Secure Checkout
+- `/auth` - Login & Registration
+- `/orders` - User Order History
+- `/wishlist` - Saved Items
+- `/admin` - Administrator Dashboard
 
-### Auth
+---
 
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/auth/logout`
-- `GET /api/auth/me`
+## 🎨 Brand Design System
 
-### Products
+The application strictly adheres to the Balaji Jewellers premium design language:
+- 🥇 **Royal Gold:** `#C9A84C` (Primary accents, buttons, highlights)
+- 🌑 **Deep Black:** `#0A0A0A` (Primary text, dark backgrounds)
+- 🕊️ **Ivory:** `#FAF7F2` (Main background, cards)
+- 🥂 **Champagne:** `#F5E6C8` (Secondary accents, subtle backgrounds)
 
-- `GET /api/products`
-- `GET /api/products/:id`
-- `POST /api/products`
-- `PUT /api/products/:id`
-- `DELETE /api/products/:id`
+*The UI utilizes vibrant colors, smooth transitions, and a clean layout to invoke a luxury, high-end feel.*
 
-### Cart And Orders
+---
 
-- `GET /api/cart`
-- `POST /api/cart/add`
-- `PUT /api/cart/update/:id`
-- `DELETE /api/cart/remove/:id`
-- `POST /api/orders`
-- `GET /api/orders`
-- `GET /api/orders/:id`
+## 📝 Additional Notes
 
-### Supporting Data
-
-- `GET /api/categories`
-- `GET /api/gold-rates`
-- `GET /api/coupons`
-
-## Home Page Sections
-
-The current home page is composed of these parts:
-
-- Hero banner
-- Balaji Promise section
-- Category browser
-- New arrivals
-- Occasion cards
-- Signature atelier
-- Purity spotlight
-- Style Matchmaker (occasion + purity + budget based recommendations)
-- Budget planner
-- Featured pieces
-- Trust badges
-- Customer reviews
-
-## New Feature Highlight: Style Matchmaker
-
-The home page now includes a high-engagement interactive concierge section called Style Matchmaker.
-
-- Shoppers select Occasion, Purity, and Budget using quick filter pills
-- The section reveals curated jewellery style directions with motion transitions
-- Each match includes a direct call-to-action that links to pre-filtered product listings
-- The feature is designed to improve discovery and keep visitors engaged longer on the home page
-
-## Verification
-
-The frontend builds successfully, and the backend starts successfully with the available MySQL configuration.
-
-## Brand Palette
-
-- Royal Gold: `#C9A84C`
-- Deep Black: `#0A0A0A`
-- Ivory: `#FAF7F2`
-- Champagne: `#F5E6C8`
-
-## Notes
-
-- The site is optimized for a luxury jewellery shopping experience.
-- WhatsApp and checkout flows rely on the configured API and environment variables.
-- If you deploy to production, update `FRONTEND_URL`, `NEXT_PUBLIC_API_URL`, and your database credentials accordingly.
+- **Image Optimization:** We utilize standard HTML `<img>` elements for product cards to ensure high reliability when loading images from varied external URLs, preventing common UI artifacts.
+- **WhatsApp Integration:** The platform includes seamless WhatsApp redirect flows for personalized concierge support.
+- **Production Deployment:** Ensure all environment variables (`FRONTEND_URL`, `NEXT_PUBLIC_API_URL`, database credentials) are properly configured in your production environments (e.g., Vercel, AWS, Heroku).
