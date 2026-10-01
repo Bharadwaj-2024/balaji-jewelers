@@ -1,7 +1,9 @@
 'use client';
 // context/CartContext.tsx
-import { createContext, useContext, useEffect, useReducer, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useReducer, useState, ReactNode } from 'react';
 import toast from 'react-hot-toast';
+import { cartAPI } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 
 export interface CartItem {
   id:             number;
@@ -56,32 +58,74 @@ const CartContext = createContext<CartCtx>({} as CartCtx);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, { items: [] });
+  const [ready, setReady] = useState(false);
+  const { user, loading: authLoading } = useAuth();
 
-  // Hydrate from localStorage
   useEffect(() => {
-    const stored = localStorage.getItem('bj_cart');
-    if (stored) dispatch({ type: 'HYDRATE', payload: JSON.parse(stored) });
-  }, []);
+    if (authLoading) return;
+    if (user) {
+      cartAPI.get()
+        .then(({ data }) => dispatch({ type: 'HYDRATE', payload: data.data?.items || [] }))
+        .catch(() => dispatch({ type: 'HYDRATE', payload: [] }))
+        .finally(() => setReady(true));
+      return;
+    }
+    try {
+      const stored = localStorage.getItem('bj_cart');
+      dispatch({ type: 'HYDRATE', payload: stored ? JSON.parse(stored) : [] });
+    } catch (_) {
+      dispatch({ type: 'HYDRATE', payload: [] });
+    }
+    setReady(true);
+  }, [user, authLoading]);
 
-  // Persist on change
   useEffect(() => {
-    localStorage.setItem('bj_cart', JSON.stringify(state.items));
-  }, [state.items]);
+    if (ready && !user) localStorage.setItem('bj_cart', JSON.stringify(state.items));
+  }, [state.items, ready, user]);
+
+  const refreshServerCart = () => cartAPI.get()
+    .then(({ data }) => dispatch({ type: 'HYDRATE', payload: data.data?.items || [] }));
 
   const addItem = (item: Omit<CartItem, 'quantity'>) => {
     dispatch({ type: 'ADD', payload: { ...item, quantity: 1 } });
     toast.success(`${item.name} added to cart!`);
+    if (user) {
+      cartAPI.add(item.product_id, 1)
+        .then(refreshServerCart)
+        .catch((error) => {
+          refreshServerCart().catch(() => {});
+          toast.error(error.response?.data?.message || 'Could not update your cart');
+        });
+    }
   };
 
   const removeItem = (productId: number) => {
+    const item = state.items.find(i => i.product_id === productId);
     dispatch({ type: 'REMOVE', payload: productId });
+    if (user && item) {
+      cartAPI.remove(item.id).catch(() => {
+        refreshServerCart().catch(() => {});
+        toast.error('Could not remove this item');
+      });
+    }
   };
 
   const updateQty = (productId: number, quantity: number) => {
+    const item = state.items.find(i => i.product_id === productId);
     dispatch({ type: 'UPDATE', payload: { id: productId, quantity } });
+    if (user && item) {
+      const request = quantity < 1 ? cartAPI.remove(item.id) : cartAPI.update(item.id, quantity);
+      request.catch((error) => {
+        refreshServerCart().catch(() => {});
+        toast.error(error.response?.data?.message || 'Could not update quantity');
+      });
+    }
   };
 
-  const clearCart = () => dispatch({ type: 'CLEAR' });
+  const clearCart = () => {
+    dispatch({ type: 'CLEAR' });
+    if (user) cartAPI.clear().catch(() => {});
+  };
 
   const count    = state.items.reduce((s, i) => s + i.quantity, 0);
   const subtotal = state.items.reduce((s, i) => s + i.price * i.quantity, 0);

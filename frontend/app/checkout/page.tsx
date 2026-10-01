@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 
 export default function CheckoutPage() {
   const { items, subtotal, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router   = useRouter();
 
   const [addresses,   setAddresses]   = useState<any[]>([]);
@@ -20,19 +20,19 @@ export default function CheckoutPage() {
   const [couponApplied, setCouponApplied] = useState(false);
   const [placing,     setPlacing]     = useState(false);
   const [ordered,     setOrdered]     = useState<number | null>(null);
-  const [invoiceNo,   setInvoiceNo]   = useState('');
 
   // New address form
   const [newAddr, setNewAddr] = useState({ full_name: user?.name||'', phone: user?.phone||'', address_line1: '', address_line2: '', city: '', state: '', pincode: '', is_default: false });
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) { router.push('/auth'); return; }
     addressesAPI.get().then(({ data }) => {
       setAddresses(data.data || []);
       const def = data.data?.find((a: any) => a.is_default);
       if (def) setSelAddress(def.id);
     });
-  }, [user]);
+  }, [user, authLoading, router]);
 
   const gst      = Math.round((subtotal - discount) * 0.03);
   const shipping  = subtotal > 10000 ? 0 : 299;
@@ -71,7 +71,6 @@ export default function CheckoutPage() {
       });
       clearCart();
       setOrdered(data.orderId);
-      if (data.invoiceNo) setInvoiceNo(data.invoiceNo);
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to place order');
     } finally {
@@ -79,16 +78,16 @@ export default function CheckoutPage() {
     }
   };
 
+  if (authLoading) return <div className="flex justify-center py-20"><div className="animate-spin w-8 h-8 border-2 border-gold border-t-transparent rounded-full" /></div>;
+
   if (ordered) return (
     <div className="max-w-[560px] mx-auto px-7 py-20 text-center">
       <div className="text-7xl mb-6">🎉</div>
       <h2 className="font-playfair text-3xl font-bold mb-3">Order Placed!</h2>
-      <p className="text-gray-500 mb-1">Order #{ordered} confirmed.</p>
-      {invoiceNo && <p className="text-amber-600 text-sm font-semibold mb-1">Invoice: {invoiceNo}</p>}
-      <p className="text-gray-400 text-sm mb-8">You'll receive a confirmation WhatsApp / email shortly.</p>
-      <div className="flex gap-3 justify-center flex-wrap">
-        <button onClick={() => router.push(`/orders/${ordered}/invoice`)} className="btn-gold px-6 py-3 text-black font-bold text-sm rounded-sm">🧾 View Bill</button>
-        <button onClick={() => router.push('/orders')} className="border border-gray-300 px-6 py-3 text-gray-700 font-semibold text-sm rounded-sm hover:bg-gray-50">📦 My Orders</button>
+      <p className="text-gray-500 mb-2">Order #{ordered} confirmed.</p>
+      <p className="text-gray-400 text-sm mb-8">You&apos;ll receive a confirmation when the order is processed.</p>
+      <div className="flex gap-4 justify-center">
+        <button onClick={() => router.push('/orders')} className="btn-gold px-6 py-3 text-black font-semibold text-sm rounded-sm">View Orders</button>
         <button onClick={() => router.push('/products')} className="btn-black px-6 py-3 text-white text-sm rounded-sm">Continue Shopping</button>
       </div>
     </div>

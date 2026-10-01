@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const SLIDES = [
   {
-    sub:   'Bridal Collection 2025',
+    sub:   'Bridal Collection 2026',
     title: 'Royal Bridal',
     em:    'Collection',
     desc:  'Adorned for your most precious moments',
@@ -16,7 +16,7 @@ const SLIDES = [
     accent:'#C9A84C',
   },
   {
-    sub:   'New Arrivals · Spring 2025',
+    sub:   'New Arrivals · 2026',
     title: 'Fresh &',
     em:    'Radiant',
     desc:  'New designs, timeless craftsmanship',

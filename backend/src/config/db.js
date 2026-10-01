@@ -12,6 +12,9 @@ const pool = mysql.createPool({
   queueLimit:       0,
   charset:          'utf8mb4',
   timezone:         '+05:30',
+  // mysql2 returns DECIMAL columns as strings by default. Prices and weights are
+  // deliberately converted to numbers so arithmetic cannot concatenate strings.
+  decimalNumbers:   true,
 });
 
 // Test connection on startup

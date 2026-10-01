@@ -1,2 +1,0 @@
-﻿plugin
-caching_sha2_password

@@ -6,7 +6,7 @@ const pool   = require('../config/db');
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure:   process.env.NODE_ENV === 'production',
-  sameSite: 'strict',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   maxAge:   7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
@@ -44,7 +44,6 @@ exports.register = async (req, res) => {
   res.status(201).json({
     success: true,
     message: 'Account created successfully.',
-    token,
     user: { id: result.insertId, name: name.trim(), email, role: 'user' },
   });
 };
@@ -80,14 +79,17 @@ exports.login = async (req, res) => {
   res.json({
     success: true,
     message: 'Logged in successfully.',
-    token,
     user: { id: user.id, name: user.name, email: user.email, role: user.role, phone: user.phone },
   });
 };
 
 // POST /api/auth/logout
 exports.logout = (req, res) => {
-  res.clearCookie('token');
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: COOKIE_OPTIONS.secure,
+    sameSite: COOKIE_OPTIONS.sameSite,
+  });
   res.json({ success: true, message: 'Logged out successfully.' });
 };
 
@@ -103,13 +105,20 @@ exports.getMe = async (req, res) => {
 // PUT /api/auth/update-profile
 exports.updateProfile = async (req, res) => {
   const { name, phone } = req.body;
-  await pool.execute('UPDATE users SET name = ?, phone = ? WHERE id = ?', [name, phone, req.user.id]);
+  if (!name?.trim()) {
+    return res.status(400).json({ success: false, message: 'Name is required.' });
+  }
+  await pool.execute('UPDATE users SET name = ?, phone = ? WHERE id = ?', [name.trim(), phone || null, req.user.id]);
   res.json({ success: true, message: 'Profile updated.' });
 };
 
 // PUT /api/auth/change-password
 exports.changePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ success: false, message: 'Current and new passwords are required.' });
+  }
 
   const [rows] = await pool.execute('SELECT password FROM users WHERE id = ?', [req.user.id]);
   const isMatch = await bcrypt.compare(currentPassword, rows[0].password);

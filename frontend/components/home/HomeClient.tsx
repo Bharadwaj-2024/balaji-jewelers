@@ -2,14 +2,11 @@
 // components/home/HomeClient.tsx
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { productsAPI, categoriesAPI } from '@/lib/api';
 import ProductCard from '@/components/product/ProductCard';
 import { ProductCardSkeleton } from '@/components/ui/Skeleton';
-import SignatureAtelier from '@/components/home/SignatureAtelier';
-import GoldBudgetPlanner from '@/components/home/GoldBudgetPlanner';
-import PuritySpotlight from '@/components/home/PuritySpotlight';
-import StyleMatchmaker from '@/components/home/StyleMatchmaker';
 
 const OCCASIONS = [
   { name: 'Wedding',     emoji: '💍', bg: '#1a0800', href: '/products?occasion=Wedding' },
@@ -90,8 +87,7 @@ export default function HomeClient() {
                     <Link href={`/products?category=${c.id}`}
                       className="img-zoom card-hover relative aspect-[3/4] block rounded-sm overflow-hidden border border-gold/15 cursor-pointer">
                       {c.image_url
-                        ? /* eslint-disable-next-line @next/next/no-img-element */
-                          <img src={c.image_url} alt={c.name} style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} loading="lazy" />
+                        ? <Image src={c.image_url} alt={c.name} fill className="object-cover" />
                         : <div className="w-full h-full bg-gradient-to-b from-[#1a0f00] to-[#0a0500]" />}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/85 to-transparent" />
                       <div className="absolute bottom-3 left-0 right-0 text-center">
@@ -146,12 +142,6 @@ export default function HomeClient() {
         </div>
       </section>
 
-      <SignatureAtelier />
-
-      <PuritySpotlight />
-
-      <StyleMatchmaker />
-
       {/* ── Budget Filter ── */}
       <section className="py-16 px-7 bg-white">
         <div className="max-w-[1200px] mx-auto text-center">
@@ -169,8 +159,6 @@ export default function HomeClient() {
           </div>
         </div>
       </section>
-
-      <GoldBudgetPlanner />
 
       {/* ── Featured ── */}
       <section className="py-20 px-7 bg-ivory">
@@ -208,14 +196,14 @@ export default function HomeClient() {
               <div key={r.name} className="bg-white p-7 rounded-sm border-t-[3px] border-gold">
                 <Stars rating={r.rating} />
                 <p className="mt-3 mb-5 text-gray-500 leading-relaxed" style={{ fontFamily: 'Cormorant Garamond,serif', fontSize: 16 }}>
-                  "{r.text}"
+                  &ldquo;{r.text}&rdquo;
                 </p>
                 <div className="flex justify-between items-center">
                   <div>
                     <div className="font-semibold text-black text-sm">{r.name}</div>
                     <div className="text-gray-400 text-[12px]">{r.city}</div>
                   </div>
-                  <div className="text-gold/20 font-playfair text-6xl leading-none">"</div>
+                  <div className="text-gold/20 font-playfair text-6xl leading-none">&rdquo;</div>
                 </div>
               </div>
             ))}

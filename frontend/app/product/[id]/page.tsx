@@ -9,7 +9,6 @@ import { useCart }     from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useAuth }     from '@/context/AuthContext';
 import ProductCard     from '@/components/product/ProductCard';
-import PurityGoldRate  from '@/components/product/PurityGoldRate';
 import { TextSkeleton } from '@/components/ui/Skeleton';
 import toast from 'react-hot-toast';
 
@@ -51,7 +50,7 @@ export default function ProductDetailPage() {
       }
     }).catch(() => router.push('/products'))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, router]);
 
   if (loading) return (
     <div className="max-w-[1200px] mx-auto px-7 py-10">
@@ -65,7 +64,6 @@ export default function ProductDetailPage() {
 
   const price   = rates ? calcProductPrice(product.gold_weight, product.purity, product.making_charges, rates) : product.price;
   const goldCost = rates ? Math.round(product.gold_weight * (product.purity==='22k'?rates.rate_22k:product.purity==='18k'?rates.rate_18k:rates.rate_14k)) : 0;
-  const unitRate = product.purity === '22k' ? rates?.rate_22k : product.purity === '18k' ? rates?.rate_18k : rates?.rate_14k;
   const gst     = Math.round(price * 0.03);
   const inCart  = isInCart(product.id);
   const inWish  = isWished(product.id);
@@ -74,7 +72,9 @@ export default function ProductDetailPage() {
   const waNum   = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '919876543210';
 
   const handleAddCart = () => {
-    addItem({ id: product.id, product_id: product.id, name: product.name, purity: product.purity, gold_weight: product.gold_weight, making_charges: product.making_charges, price, image: mainImg });
+    if (!inCart) {
+      addItem({ id: product.id, product_id: product.id, name: product.name, purity: product.purity, gold_weight: product.gold_weight, making_charges: product.making_charges, price, image: mainImg });
+    }
   };
 
   const handleSubmitReview = async () => {
@@ -189,12 +189,10 @@ export default function ProductDetailPage() {
 
           <div className="gold-line mb-5" />
 
-          <PurityGoldRate purity={product.purity} rates={rates} />
-
           {/* Price breakdown */}
           <div className="bg-champ p-5 rounded-sm mb-5">
             <div className="text-[10px] text-gray-400 tracking-[1px] uppercase mb-3">Price Breakdown</div>
-            {[[`Gold Cost (${product.gold_weight}g × ${formatPrice(unitRate||0)})`, formatPrice(goldCost)],['Making Charges', formatPrice(product.making_charges)],['GST (3%)', formatPrice(gst)]].map(([k,v])=>(
+            {[[`Gold Cost (${product.gold_weight}g × ${formatPrice(rates?.rate_22k||0)})`, formatPrice(goldCost)],['Making Charges', formatPrice(product.making_charges)],['GST (3%)', formatPrice(gst)]].map(([k,v])=>(
               <div key={k} className="flex justify-between text-[13px] text-gray-500 mb-1.5"><span>{k}</span><span>{v}</span></div>
             ))}
             <div className="gold-line my-2" />
@@ -231,10 +229,10 @@ export default function ProductDetailPage() {
 
           {/* Action buttons */}
           <div className="grid grid-cols-2 gap-3 mb-3">
-            <button onClick={handleAddCart} className={`${inCart?'btn-black':'btn-gold'} py-4 text-[13px] font-bold tracking-wide rounded-sm ${inCart?'text-white':'text-black'}`}>
-              {inCart ? '✓ Added to Cart' : '🛒 Add to Cart'}
+            <button onClick={handleAddCart} disabled={product.stock_quantity < 1} className={`${inCart?'btn-black':'btn-gold'} py-4 text-[13px] font-bold tracking-wide rounded-sm disabled:opacity-50 ${inCart?'text-white':'text-black'}`}>
+              {product.stock_quantity < 1 ? 'Out of Stock' : inCart ? '✓ Added to Cart' : '🛒 Add to Cart'}
             </button>
-            <button onClick={() => { handleAddCart(); router.push('/checkout'); }} className="btn-black py-4 text-white text-[13px] font-semibold tracking-wide rounded-sm">
+            <button onClick={() => { handleAddCart(); router.push('/checkout'); }} disabled={product.stock_quantity < 1} className="btn-black py-4 text-white text-[13px] font-semibold tracking-wide rounded-sm disabled:opacity-50">
               ⚡ Buy Now
             </button>
           </div>

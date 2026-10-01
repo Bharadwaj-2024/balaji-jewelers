@@ -9,25 +9,12 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Attach JWT from localStorage on every request
-api.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('bj_token');
-    if (token) config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
 // Handle 401 — redirect to login
 api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401 && typeof window !== 'undefined') {
-      localStorage.removeItem('bj_token');
       localStorage.removeItem('bj_user');
-      if (!window.location.pathname.includes('/auth')) {
-        window.location.href = '/auth';
-      }
     }
     return Promise.reject(err);
   }
@@ -70,12 +57,11 @@ export const wishlistAPI = {
 };
 
 export const ordersAPI = {
-  create:       (data: any)               => api.post('/orders', data),
-  getMy:        ()                        => api.get('/orders'),
-  getById:      (id: string | number)     => api.get(`/orders/${id}`),
-  getInvoice:   (id: string | number)     => api.get(`/orders/${id}/invoice`),
-  updateStatus: (id: number, data: any)   => api.put(`/orders/${id}/status`, data),
-  getAll:       (params?: any)            => api.get('/admin/orders', { params }),
+  create:     (data: any)               => api.post('/orders', data),
+  getMy:      ()                        => api.get('/orders'),
+  getById:    (id: string | number)     => api.get(`/orders/${id}`),
+  updateStatus: (id: number, data: any) => api.put(`/orders/${id}/status`, data),
+  getAll:     (params?: any)            => api.get('/admin/orders', { params }),
 };
 
 export const reviewsAPI = {
@@ -120,6 +106,6 @@ export const calcProductPrice = (
   makingCharges: number,
   rates: { rate_22k: number; rate_18k: number; rate_14k: number }
 ): number => {
-  const rate = purity === '22k' ? rates.rate_22k : purity === '18k' ? rates.rate_18k : rates.rate_14k;
-  return Math.round(goldWeight * rate + makingCharges);
+  const rate = Number(purity === '22k' ? rates.rate_22k : purity === '18k' ? rates.rate_18k : rates.rate_14k);
+  return Math.round(Number(goldWeight) * rate + Number(makingCharges));
 };

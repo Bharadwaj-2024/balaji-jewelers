@@ -1,37 +1,28 @@
-# Dependencies
+# Dependencies and builds
 node_modules/
-.pnp
-.pnp.js
-
-# Build outputs
 .next/
-out/
-build/
 dist/
+build/
+coverage/
 
-# Environment files
+# Local environment and credentials
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
+!.env.example
 
-# Debug logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# OS files
+# Logs and editor files
+*.log
+*.tsbuildinfo
 .DS_Store
 Thumbs.db
-Desktop.ini
-
-# IDE
 .vscode/
 .idea/
-*.swp
-*.swo
 
-# Misc
-*.tsbuildinfo
-next-env.d.ts
+# Next.js-generated local agent guidance
+frontend/AGENTS.md
+frontend/CLAUDE.md
+
+# Uploaded or temporary content
+backend/uploads/
+tmp/

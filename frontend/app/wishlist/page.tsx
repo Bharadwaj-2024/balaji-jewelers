@@ -53,7 +53,7 @@ export default function WishlistPage() {
                 <Link href={`/product/${p.id}`} className="font-playfair text-[14px] font-semibold hover:text-gold transition-colors block mb-3">{p.name}</Link>
                 <div className="font-bold text-lg mb-3">{formatPrice(price)}</div>
                 <div className="flex gap-2">
-                  <button onClick={() => { addItem({id:p.id,product_id:p.id,name:p.name,purity:p.purity,gold_weight:p.gold_weight,making_charges:p.making_charges,price,image:img}); }}
+                  <button onClick={() => { if (!inCart) addItem({id:p.id,product_id:p.id,name:p.name,purity:p.purity,gold_weight:p.gold_weight,making_charges:p.making_charges,price,image:img}); }}
                     className={`flex-1 py-2 text-[12px] font-semibold rounded-sm ${inCart?'btn-black text-white':'btn-gold text-black'}`}>
                     {inCart ? '✓ In Cart' : 'Add to Cart'}
                   </button>

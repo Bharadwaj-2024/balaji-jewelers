@@ -1,7 +1,15 @@
 // src/controllers/productController.js
 const pool           = require('../config/db');
-const mysql2         = require('mysql2');
 const { cloudinary } = require('../config/cloudinary');
+
+const uploadImageBuffer = (buffer) => new Promise((resolve, reject) => {
+  const stream = cloudinary.uploader.upload_stream({
+    folder: 'balaji-jewellers',
+    resource_type: 'image',
+    transformation: [{ width: 800, height: 800, crop: 'limit', quality: 'auto:good' }],
+  }, (error, result) => error ? reject(error) : resolve(result));
+  stream.end(buffer);
+});
 
 // GET /api/products
 exports.getProducts = async (req, res) => {
@@ -15,9 +23,15 @@ exports.getProducts = async (req, res) => {
   let conditions = ['1=1'];
   const params   = [];
 
-  if (category)    { conditions.push('p.category_id = ?');  params.push(category); }
-  if (purity)      { conditions.push('p.purity = ?');        params.push(purity); }
-  if (occasion)    { conditions.push('p.occasion = ?');      params.push(occasion); }
+  const addListFilter = (column, value) => {
+    const values = String(value || '').split(',').map(v => v.trim()).filter(Boolean).slice(0, 20);
+    if (!values.length) return;
+    conditions.push(`${column} IN (${values.map(() => '?').join(',')})`);
+    params.push(...values);
+  };
+  if (category) addListFilter('p.category_id', category);
+  if (purity) addListFilter('p.purity', purity);
+  if (occasion) addListFilter('p.occasion', occasion);
   if (is_featured) { conditions.push('p.is_featured = 1'); }
   if (is_new)      { conditions.push('p.is_new = 1'); }
   if (min_price)   { conditions.push('p.price >= ?');        params.push(min_price); }
@@ -31,16 +45,12 @@ exports.getProducts = async (req, res) => {
   const sortCol       = allowedSorts[sort] || 'p.created_at';
   const sortOrder     = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
-  const limitInt = parseInt(limit);
-  const offset   = (parseInt(page) - 1) * limitInt;
+  const pageNumber = Math.max(1, Number.parseInt(page, 10) || 1);
+  const pageLimit = Math.min(100, Math.max(1, Number.parseInt(limit, 10) || 12));
+  const offset = (pageNumber - 1) * pageLimit;
 
-  // Use mysql2.format() + pool.query() to avoid the "Incorrect arguments to
-  // mysqld_stmt_execute" error that occurs with pool.execute() when mixing
-  // filter params (string) with LIMIT/OFFSET (integer) in complex queries.
-  const whereSql = conditions.join(' AND ');
-
-  const mainSql = mysql2.format(
-    `SELECT
+  const sql = `
+    SELECT
       p.*,
       c.name AS category_name,
       (SELECT image_url FROM product_images WHERE product_id = p.id AND is_primary = 1 LIMIT 1) AS primary_image,
@@ -49,31 +59,41 @@ exports.getProducts = async (req, res) => {
       COUNT(DISTINCT r.id) AS review_count
     FROM products p
     LEFT JOIN categories c ON p.category_id = c.id
-    LEFT JOIN reviews r    ON r.product_id  = p.id
-    WHERE ${whereSql}
+    LEFT JOIN reviews r ON r.product_id = p.id
+    WHERE ${conditions.join(' AND ')}
     GROUP BY p.id
     ORDER BY ${sortCol} ${sortOrder}
-    LIMIT ? OFFSET ?`,
-    [...params, limitInt, offset]
-  );
+    LIMIT ? OFFSET ?
+  `;
+  params.push(pageLimit, offset);
 
-  const countSql = mysql2.format(
-    `SELECT COUNT(DISTINCT p.id) AS total FROM products p WHERE ${whereSql}`,
-    params
-  );
+  const [products] = await pool.execute(sql, params);
 
-  const [products]  = await pool.query(mainSql);
-  const [countRows] = await pool.query(countSql);
+  const [rateRows] = await pool.execute('SELECT rate_22k, rate_18k, rate_14k FROM gold_rates ORDER BY id DESC LIMIT 1');
+  const rates = rateRows[0];
+  const pricedProducts = products.map(product => {
+    if (!rates || product.gold_weight == null) return product;
+    const rate = product.purity === '22k' ? rates.rate_22k : product.purity === '18k' ? rates.rate_18k : rates.rate_14k;
+    return {
+      ...product,
+      base_price: Number(product.price),
+      price: Math.round(Number(product.gold_weight) * Number(rate) + Number(product.making_charges || 0)),
+    };
+  });
+
+  // Total count
+  const countSql = `SELECT COUNT(DISTINCT p.id) AS total FROM products p WHERE ${conditions.join(' AND ')}`;
+  const [countRows] = await pool.execute(countSql, params.slice(0, -2));
   const total = countRows[0].total;
 
   res.json({
     success: true,
-    data: products,
+    data: pricedProducts,
     pagination: {
       total,
-      page:       parseInt(page),
-      limit:      limitInt,
-      totalPages: Math.ceil(total / limitInt),
+      page:       pageNumber,
+      limit:      pageLimit,
+      totalPages: Math.ceil(total / pageLimit),
     },
   });
 };
@@ -100,12 +120,25 @@ exports.getProductById = async (req, res) => {
   const [images]   = await pool.execute('SELECT * FROM product_images WHERE product_id = ? ORDER BY is_primary DESC, sort_order ASC', [id]);
   const [variants] = await pool.execute('SELECT * FROM product_variants WHERE product_id = ?', [id]);
 
-  res.json({ success: true, data: { ...rows[0], images, variants } });
+  const [rateRows] = await pool.execute('SELECT rate_22k, rate_18k, rate_14k FROM gold_rates ORDER BY id DESC LIMIT 1');
+  const product = rows[0];
+  if (rateRows.length && product.gold_weight != null) {
+    const rates = rateRows[0];
+    const rate = product.purity === '22k' ? rates.rate_22k : product.purity === '18k' ? rates.rate_18k : rates.rate_14k;
+    product.base_price = Number(product.price);
+    product.price = Math.round(Number(product.gold_weight) * Number(rate) + Number(product.making_charges || 0));
+  }
+
+  res.json({ success: true, data: { ...product, images, variants } });
 };
 
 // POST /api/products (admin)
 exports.createProduct = async (req, res) => {
   const { name, category_id, price, gold_weight, purity, making_charges, description, occasion, stock_quantity, is_featured, is_new } = req.body;
+
+  if (!name?.trim() || !['14k', '18k', '22k'].includes(purity) || !Number.isFinite(Number(gold_weight)) || Number(gold_weight) <= 0 || !Number.isFinite(Number(price)) || Number(price) < 0) {
+    return res.status(400).json({ success: false, message: 'Name, purity, gold weight, and a valid price are required.' });
+  }
 
   const [result] = await pool.execute(
     `INSERT INTO products (name, category_id, price, gold_weight, purity, making_charges, description, occasion, stock_quantity, is_featured, is_new)
@@ -137,6 +170,10 @@ exports.updateProduct = async (req, res) => {
 // DELETE /api/products/:id (admin)
 exports.deleteProduct = async (req, res) => {
   const { id } = req.params;
+  const [[history]] = await pool.execute('SELECT COUNT(*) AS total FROM order_items WHERE product_id = ?', [id]);
+  if (history.total > 0) {
+    return res.status(409).json({ success: false, message: 'Products with order history cannot be deleted. Set stock to zero instead.' });
+  }
   const [images] = await pool.execute('SELECT image_url FROM product_images WHERE product_id = ?', [id]);
 
   // Delete from Cloudinary
@@ -154,13 +191,18 @@ exports.uploadImages = async (req, res) => {
   const { id } = req.params;
   if (!req.files?.length) return res.status(400).json({ success: false, message: 'No images uploaded.' });
 
+  const [products] = await pool.execute('SELECT id FROM products WHERE id = ?', [id]);
+  if (!products.length) return res.status(404).json({ success: false, message: 'Product not found.' });
+
   const isPrimary = req.body.is_primary === 'true';
+  if (isPrimary) await pool.execute('UPDATE product_images SET is_primary = 0 WHERE product_id = ?', [id]);
 
   for (let i = 0; i < req.files.length; i++) {
     const file = req.files[i];
+    const uploaded = await uploadImageBuffer(file.buffer);
     await pool.execute(
       'INSERT INTO product_images (product_id, image_url, is_primary, sort_order) VALUES (?, ?, ?, ?)',
-      [id, file.path, i === 0 && isPrimary ? 1 : 0, i]
+      [id, uploaded.secure_url, i === 0 && isPrimary ? 1 : 0, i]
     );
   }
 
@@ -169,8 +211,8 @@ exports.uploadImages = async (req, res) => {
 
 // DELETE /api/products/:id/images/:imageId (admin)
 exports.deleteImage = async (req, res) => {
-  const { imageId } = req.params;
-  const [rows] = await pool.execute('SELECT image_url FROM product_images WHERE id = ?', [imageId]);
+  const { id, imageId } = req.params;
+  const [rows] = await pool.execute('SELECT image_url FROM product_images WHERE id = ? AND product_id = ?', [imageId, id]);
   if (!rows.length) return res.status(404).json({ success: false, message: 'Image not found.' });
 
   const publicId = rows[0].image_url.split('/').pop().split('.')[0];
