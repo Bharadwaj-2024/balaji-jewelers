@@ -27,33 +27,70 @@ exports.getCart = async (req, res) => {
 };
 
 exports.addToCart = async (req, res) => {
-  const { product_id, quantity = 1 } = req.body;
+  const productId = Number(req.body.product_id);
+  const quantity = Number(req.body.quantity ?? 1);
+  if (!Number.isInteger(productId) || productId < 1 || !Number.isInteger(quantity) || quantity < 1) {
+    return res.status(400).json({ success: false, message: 'A valid product and positive quantity are required.' });
+  }
+  const [products] = await pool.execute('SELECT stock_quantity FROM products WHERE id = ?', [productId]);
+  if (!products.length) return res.status(404).json({ success: false, message: 'Product not found.' });
+
   const [cart] = await pool.execute('SELECT id FROM cart WHERE user_id = ?', [req.user.id]);
   let cartId = cart[0]?.id;
   if (!cartId) {
     const [r] = await pool.execute('INSERT INTO cart (user_id) VALUES (?)', [req.user.id]);
     cartId = r.insertId;
   }
+  const [[current]] = await pool.execute(
+    'SELECT quantity FROM cart_items WHERE cart_id = ? AND product_id = ?',
+    [cartId, productId]
+  );
+  if ((current?.quantity || 0) + quantity > products[0].stock_quantity) {
+    return res.status(400).json({ success: false, message: 'Requested quantity exceeds available stock.' });
+  }
   await pool.execute(
     'INSERT INTO cart_items (cart_id, product_id, quantity) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE quantity = quantity + ?',
-    [cartId, product_id, quantity, quantity]
+    [cartId, productId, quantity, quantity]
   );
   res.json({ success: true, message: 'Added to cart.' });
 };
 
 exports.updateCartItem = async (req, res) => {
   const { id } = req.params;
-  const { quantity } = req.body;
+  const quantity = Number(req.body.quantity);
+  if (!Number.isInteger(quantity)) {
+    return res.status(400).json({ success: false, message: 'Quantity must be an integer.' });
+  }
   if (quantity < 1) {
-    await pool.execute('DELETE FROM cart_items WHERE id = ?', [id]);
+    await pool.execute(
+      'DELETE ci FROM cart_items ci JOIN cart c ON c.id = ci.cart_id WHERE ci.id = ? AND c.user_id = ?',
+      [id, req.user.id]
+    );
     return res.json({ success: true, message: 'Item removed.' });
   }
-  await pool.execute('UPDATE cart_items SET quantity = ? WHERE id = ?', [quantity, id]);
+  const [rows] = await pool.execute(
+    `SELECT p.stock_quantity FROM cart_items ci
+     JOIN cart c ON c.id = ci.cart_id
+     JOIN products p ON p.id = ci.product_id
+     WHERE ci.id = ? AND c.user_id = ?`,
+    [id, req.user.id]
+  );
+  if (!rows.length) return res.status(404).json({ success: false, message: 'Cart item not found.' });
+  if (quantity > rows[0].stock_quantity) {
+    return res.status(400).json({ success: false, message: 'Requested quantity exceeds available stock.' });
+  }
+  await pool.execute(
+    'UPDATE cart_items ci JOIN cart c ON c.id = ci.cart_id SET ci.quantity = ? WHERE ci.id = ? AND c.user_id = ?',
+    [quantity, id, req.user.id]
+  );
   res.json({ success: true, message: 'Cart updated.' });
 };
 
 exports.removeFromCart = async (req, res) => {
-  await pool.execute('DELETE FROM cart_items WHERE id = ?', [req.params.id]);
+  await pool.execute(
+    'DELETE ci FROM cart_items ci JOIN cart c ON c.id = ci.cart_id WHERE ci.id = ? AND c.user_id = ?',
+    [req.params.id, req.user.id]
+  );
   res.json({ success: true, message: 'Item removed from cart.' });
 };
 
@@ -140,8 +177,10 @@ exports.getGoldRates = async (req, res) => {
 };
 
 exports.updateGoldRates = async (req, res) => {
-  const { rate_22k, rate_18k, rate_14k } = req.body;
-  if (!rate_22k || !rate_18k || !rate_14k) {
+  const rate_22k = Number(req.body.rate_22k);
+  const rate_18k = Number(req.body.rate_18k);
+  const rate_14k = Number(req.body.rate_14k);
+  if (![rate_22k, rate_18k, rate_14k].every(rate => Number.isFinite(rate) && rate > 0)) {
     return res.status(400).json({ success: false, message: 'All three rates are required.' });
   }
   await pool.execute(
@@ -162,6 +201,9 @@ exports.getAddresses = async (req, res) => {
 
 exports.addAddress = async (req, res) => {
   const { full_name, phone, address_line1, address_line2, city, state, pincode, country, is_default } = req.body;
+  if (!full_name?.trim() || !phone?.trim() || !address_line1?.trim() || !city?.trim() || !state?.trim() || !/^\d{6}$/.test(String(pincode || ''))) {
+    return res.status(400).json({ success: false, message: 'Complete name, phone, address, city, state, and a valid 6-digit pincode are required.' });
+  }
   if (is_default) await pool.execute('UPDATE addresses SET is_default = 0 WHERE user_id = ?', [req.user.id]);
   const [result] = await pool.execute(
     'INSERT INTO addresses (user_id, full_name, phone, address_line1, address_line2, city, state, pincode, country, is_default) VALUES (?,?,?,?,?,?,?,?,?,?)',
@@ -173,6 +215,9 @@ exports.addAddress = async (req, res) => {
 exports.updateAddress = async (req, res) => {
   const { id } = req.params;
   const { full_name, phone, address_line1, address_line2, city, state, pincode, country, is_default } = req.body;
+  if (!full_name?.trim() || !phone?.trim() || !address_line1?.trim() || !city?.trim() || !state?.trim() || !/^\d{6}$/.test(String(pincode || ''))) {
+    return res.status(400).json({ success: false, message: 'Complete name, phone, address, city, state, and a valid 6-digit pincode are required.' });
+  }
   if (is_default) await pool.execute('UPDATE addresses SET is_default = 0 WHERE user_id = ?', [req.user.id]);
   await pool.execute(
     'UPDATE addresses SET full_name=?, phone=?, address_line1=?, address_line2=?, city=?, state=?, pincode=?, country=?, is_default=? WHERE id=? AND user_id=?',
@@ -235,7 +280,11 @@ exports.getCoupons = async (req, res) => {
 };
 
 exports.validateCoupon = async (req, res) => {
-  const { code, order_total } = req.body;
+  const code = String(req.body.code || '').trim().toUpperCase();
+  const order_total = Number(req.body.order_total);
+  if (!code || !Number.isFinite(order_total) || order_total < 0) {
+    return res.status(400).json({ success: false, message: 'A coupon code and valid order total are required.' });
+  }
   const [rows] = await pool.execute(
     'SELECT * FROM coupons WHERE code = ? AND is_active = 1 AND (expires_at IS NULL OR expires_at > NOW()) AND used_count < max_uses AND min_order <= ?',
     [code, order_total]

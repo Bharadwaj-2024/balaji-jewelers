@@ -63,7 +63,7 @@ export default function Footer() {
 
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="text-white/30 text-[12px]">
-            © 2025 Balaji Jewellers. GST: 29AXXXX1234X1Z5. All rights reserved.
+            © {new Date().getFullYear()} Balaji Jewellers. GST: 29AXXXX1234X1Z5. All rights reserved.
           </div>
           <a
             href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '919876543210'}`}

@@ -20,30 +20,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const stored = typeof window !== 'undefined' ? localStorage.getItem('bj_user') : null;
-    if (stored) {
-      try { setUser(JSON.parse(stored)); } catch (_) {}
-    }
-    setLoading(false);
+    authAPI.me()
+      .then(({ data }) => {
+        setUser(data.user);
+        localStorage.setItem('bj_user', JSON.stringify(data.user));
+      })
+      .catch(() => {
+        setUser(null);
+        localStorage.removeItem('bj_user');
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const login = async (email: string, password: string) => {
     const { data } = await authAPI.login({ email, password });
-    localStorage.setItem('bj_token', data.token);
     localStorage.setItem('bj_user', JSON.stringify(data.user));
     setUser(data.user);
   };
 
   const register = async (name: string, email: string, password: string, phone?: string) => {
     const { data } = await authAPI.register({ name, email, password, phone });
-    localStorage.setItem('bj_token', data.token);
     localStorage.setItem('bj_user', JSON.stringify(data.user));
     setUser(data.user);
   };
 
   const logout = async () => {
     await authAPI.logout().catch(() => {});
-    localStorage.removeItem('bj_token');
     localStorage.removeItem('bj_user');
     setUser(null);
   };

@@ -113,28 +113,6 @@ CREATE TABLE order_items (
   FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
--- Order Bills (invoice snapshot — saved once at order creation)
-CREATE TABLE order_bills (
-  id              INT AUTO_INCREMENT PRIMARY KEY,
-  order_id        INT NOT NULL UNIQUE,
-  invoice_no      VARCHAR(30) NOT NULL,        -- e.g. BJ-2024-00001
-  customer_name   VARCHAR(100) NOT NULL,
-  customer_email  VARCHAR(150),
-  customer_phone  VARCHAR(15),
-  delivery_address TEXT,                        -- full address as formatted string
-  items_json      JSON NOT NULL,               -- snapshot of items at time of order
-  subtotal        DECIMAL(10,2),
-  making_charges  DECIMAL(10,2),
-  discount        DECIMAL(10,2) DEFAULT 0,
-  gst             DECIMAL(10,2),
-  shipping        DECIMAL(10,2) DEFAULT 0,
-  total_amount    DECIMAL(10,2),
-  payment_method  VARCHAR(20),
-  coupon_code     VARCHAR(50),
-  bill_date       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
-);
-
 -- Reviews
 CREATE TABLE reviews (
   id          INT AUTO_INCREMENT PRIMARY KEY,
@@ -208,7 +186,6 @@ CREATE INDEX idx_products_featured  ON products(is_featured);
 CREATE INDEX idx_order_items_order  ON order_items(order_id);
 CREATE INDEX idx_reviews_product    ON reviews(product_id);
 CREATE INDEX idx_cart_items_cart    ON cart_items(cart_id);
-CREATE INDEX idx_order_bills_order  ON order_bills(order_id);
 
 -- ======================== SEED DATA ========================
 
@@ -238,7 +215,7 @@ INSERT INTO products (name, category_id, price, gold_weight, purity, making_char
 
 -- Admin user — password: Admin@123 (bcrypt hash)
 INSERT INTO users (name, email, password, phone, role) VALUES
-  ('Admin', 'admin@balajijewellers.com', '$2b$12$LQ9aBzR0l9xK6q/SYPg8dOWc4pJlHHLgYi3nIFBEJe5KHvtv7jkRi', '9876543210', 'admin');
+  ('Admin', 'admin@balajijewellers.com', '$2b$12$PcF.6wJai1Lpfirkb.s7Ieo99jy6JhFn2MDF4SfG0g2UgmvETscwm', '9876543210', 'admin');
 
 INSERT INTO coupons (code, discount_type, discount_value, min_order) VALUES
   ('BALAJI10',  'percent', 10,  10000),

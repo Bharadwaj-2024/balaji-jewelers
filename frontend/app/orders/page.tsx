@@ -16,7 +16,7 @@ const STATUS_COLORS: Record<string,{bg:string;txt:string}> = {
 const STEPS = ['Order Placed','Processing','Shipped','Delivered'];
 
 export default function OrdersPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router   = useRouter();
   const [orders, setOrders]   = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,11 +24,12 @@ export default function OrdersPage() {
   const [detail, setDetail] = useState<Record<number, any>>({});
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) { router.push('/auth'); return; }
     ordersAPI.getMy()
       .then(({ data }) => setOrders(data.data || []))
       .finally(() => setLoading(false));
-  }, [user]);
+  }, [user, authLoading, router]);
 
   const loadDetail = async (id: number) => {
     if (detail[id]) { setExpanded(expanded === id ? null : id); return; }
@@ -39,7 +40,7 @@ export default function OrdersPage() {
 
   const stepIdx = (status: string) => ['pending','processing','shipped','delivered'].indexOf(status);
 
-  if (loading) return <div className="flex justify-center py-20"><div className="animate-spin w-8 h-8 border-2 border-gold border-t-transparent rounded-full" /></div>;
+  if (loading || authLoading) return <div className="flex justify-center py-20"><div className="animate-spin w-8 h-8 border-2 border-gold border-t-transparent rounded-full" /></div>;
 
   return (
     <div className="max-w-[900px] mx-auto px-7 py-10">
@@ -60,15 +61,10 @@ export default function OrdersPage() {
             return (
               <div key={o.id} className="bg-white rounded-sm shadow-sm overflow-hidden">
                 {/* Header */}
-                <div className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="cursor-pointer flex-1" onClick={() => loadDetail(o.id)}>
+                <div className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => loadDetail(o.id)}>
+                  <div>
                     <div className="flex items-center gap-3 mb-1">
                       <span className="font-playfair font-semibold">Order #{o.id}</span>
-                      {o.invoice_no && (
-                        <span className="text-[10px] text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full font-medium">
-                          {o.invoice_no}
-                        </span>
-                      )}
                       <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full" style={{ background: sc.bg, color: sc.txt }}>
                         {o.status.toUpperCase()}
                       </span>
@@ -76,20 +72,9 @@ export default function OrdersPage() {
                     <div className="text-[13px] text-gray-400">{new Date(o.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' })}</div>
                     <div className="text-[13px] text-gray-500 mt-1 line-clamp-1">{o.product_names}</div>
                   </div>
-                  <div className="text-right flex flex-col items-end gap-2">
+                  <div className="text-right">
                     <div className="font-playfair text-xl font-bold">{formatPrice(o.total_amount)}</div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => loadDetail(o.id)}
-                        className="text-[11px] text-gold border border-gold/30 px-3 py-1.5 rounded-sm hover:bg-amber-50 transition-colors">
-                        {expanded === o.id ? '▲ Hide' : '▼ Details'}
-                      </button>
-                      <button
-                        onClick={() => router.push(`/orders/${o.id}/invoice`)}
-                        className="text-[11px] bg-amber-500 text-black font-semibold px-3 py-1.5 rounded-sm hover:bg-amber-400 transition-colors">
-                        🧾 View Bill
-                      </button>
-                    </div>
+                    <div className="text-gold text-[12px] mt-1">{expanded === o.id ? '▲ Hide details' : '▼ View details'}</div>
                   </div>
                 </div>
 

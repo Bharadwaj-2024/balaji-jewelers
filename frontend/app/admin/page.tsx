@@ -1,6 +1,6 @@
 'use client';
 // app/admin/page.tsx
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth }   from '@/context/AuthContext';
 import { adminAPI, productsAPI, ordersAPI, goldRatesAPI, categoriesAPI, formatPrice } from '@/lib/api';
@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 type Tab = 'overview'|'products'|'orders'|'gold'|'users';
 
 export default function AdminPage() {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, loading: authLoading } = useAuth();
   const router = useRouter();
   const [tab, setTab]         = useState<Tab>('overview');
   const [stats, setStats]     = useState<any>(null);
@@ -21,13 +21,7 @@ export default function AdminPage() {
   const [newRates, setNewRates] = useState({ rate_22k:'', rate_18k:'', rate_14k:'' });
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!user) { router.push('/auth'); return; }
-    if (!isAdmin) { router.push('/'); return; }
-    loadData();
-  }, [user, isAdmin]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       const [s, p, o, u, c, r] = await Promise.all([
         adminAPI.stats(), productsAPI.getAll({ limit: 50 }), ordersAPI.getAll(),
@@ -41,7 +35,14 @@ export default function AdminPage() {
       setRates(r.data.data);
       setNewRates({ rate_22k: r.data.data?.rate_22k, rate_18k: r.data.data?.rate_18k, rate_14k: r.data.data?.rate_14k });
     } catch { toast.error('Failed to load data'); }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user) { router.push('/auth'); return; }
+    if (!isAdmin) { router.push('/'); return; }
+    loadData();
+  }, [user, isAdmin, authLoading, router, loadData]);
 
   const updateStatus = async (orderId: number, status: string) => {
     await ordersAPI.updateStatus(orderId, { status });
@@ -75,6 +76,8 @@ export default function AdminPage() {
     pending:{bg:'#FFF3CD',txt:'#856404'},processing:{bg:'#CCE5FF',txt:'#004085'},
     shipped:{bg:'#D4EDDA',txt:'#155724'},delivered:{bg:'#D1ECF1',txt:'#0C5460'},cancelled:{bg:'#F8D7DA',txt:'#721C24'},
   };
+
+  if (authLoading) return <div className="flex justify-center py-20"><div className="animate-spin w-8 h-8 border-2 border-gold border-t-transparent rounded-full" /></div>;
 
   return (
     <div className="flex min-h-screen bg-gray-50">
